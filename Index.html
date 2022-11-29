@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script>var exports = null;</script>
+    <script src="build/teste.js" type="module" defer></script>
+    <title>Tetris</title>
+    <style>
+        * {margin:0;padding:0;box-sizing: border-box; font-family: 'Roboto', sans-serif;}
+
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;500&display=swap');
+/*
+  #F8B195
+  #F67280
+  #C06C84
+  #6C5B7B
+  #355C7D
+*/ 
+        #start-scene,
+        #main-scene{
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: radial-gradient(#56728a, #355C7D);
+            height: 100vh;
+            color: white;
+            flex-direction: column;          
+        }
+        @keyframes blink {
+           0%{
+             opacity: 0;
+           } 
+           50%{
+             opacity: 0;
+           }
+           51%{
+             opacity: 1;
+           } 
+           100%{
+             opacity: 1;
+           }
+        }
+        #start-scene  h1 {  font-size: 6rem; }
+        #start-scene  h2 {  font-size: 2rem; font-weight: 100; animation: blink 1s linear infinite; }
+
+        #box
+        {
+            display: flex;
+           /* height: 520px;*/               
+            width: 500px;
+            box-shadow: 0px 0px 20px #355C7D;
+            /*border:solid 7px black;*/
+        }
+        #board
+        { 
+            height: 510px;               
+            width: 300px;
+            background-color:  #F8B195;
+            border-right:1px solid  #F67280;                    
+        }
+
+        #painel
+        {           
+            height: 510px;          
+            width: 200px;
+            background-color: #F67280;   
+            padding: 2rem; 
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;    
+        }
+        #score,
+        #next{            
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: 500;
+            letter-spacing: .5rem;
+            background-color:#C06C84;
+            padding: .5rem 0 .5rem 0;
+        }
+
+        #next { height: 300px; }
+        .row
+        {
+            display: flex;
+            width: 100%;
+            height: 30px;
+        
+        }
+        .cell
+        {
+            display: absolute;
+            width: 30px;
+            height: 30px;
+            border: solid 1px #C06C84;
+        }
+
+        .busy{
+            border-bottom: inset 4px rgb(56, 54, 73);
+            border-left: 4px outset rgb(109, 114, 129);
+            border-top: 4px outset rgb(142, 148, 161);
+            border-right: 4px inset rgb(226, 230, 240);
+            background-color: lightcoral;
+        }
+       
+        
+    </style>
+    
+</head>
+<body>
+    <div id="start-scene">  
+        <h1>TETRIS</h1>
+        <h2>PRESS ENTER</h2>
+    </div>
+    <div id="main-scene">  
+        <div id="box">      
+            <div id="board"></div>        
+            <div id="painel">
+                <div id="score">0000</div>
+                <div id="next">!</div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>
