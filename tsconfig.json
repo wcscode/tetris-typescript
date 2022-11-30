@@ -1,14 +1,17 @@
 {
   "compilerOptions": {
-    "target": "es5",                          
-    "module": "commonjs",                    
-    "lib": ["DOM","es6"],                     
+    "target": "ES6",                          
+    "module": "AMD", 
+   // "outFile": "./build/compilado.js",                   
+    "lib": ["DOM","ES6"],                     
     "allowJs": true,
     "outDir": "build",                          
     "rootDir": "src",
     "strict": true,         
     "noImplicitAny": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true
-  }
+    //"resolveJsonModule": true   
+  }//,"exclude": [
+   // "node_modules/*"
+//]
 }
