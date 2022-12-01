@@ -1,4 +1,4 @@
-import * as f from './functions';
+import * as f from './functions.js';
 
 let board: HTMLElement;
 const MAX_X: number = 10;

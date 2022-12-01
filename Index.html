@@ -3,13 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <script>var exports = null;</script>
-    
-   <!-- <script src="build/compilado.js" type="module" defer></script>-->
-   <!--<script data-main="build/teste" type="text/javascript" 
-            src="build/require.js"></script>=-->
-            <script src="build/teste.js" type="module" defer></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">     
+    <script src="build/index.js" type="module" defer></script>
     <title>Tetris</title>
     <style>
         * {margin:0;padding:0;box-sizing: border-box; font-family: 'Roboto', sans-serif;}
@@ -55,17 +50,15 @@
            /* height: 520px;*/               
             width: 500px;
             box-shadow: 0px 0px 20px #355C7D;
-            /*border:solid 7px black;*/
-           
-            
-           
+            border:solid .5rem #F67280;
         }
+
         #board
         { 
             height: 510px;               
             width: 300px;
             background-color:  #F8B195;
-            border-right:1px solid  #F67280;                    
+            /*border-right:1px solid  #F67280;  */                  
         }
 
         #painel
@@ -101,15 +94,11 @@
             display: absolute;
             width: 30px;
             height: 30px;
-            border: solid 1px #C06C84;
+            border: solid 1px #F67280;
         }
 
-        .busy{
-            border-bottom: inset 4px rgb(56, 54, 73);
-            border-left: 4px outset rgb(109, 114, 129);
-            border-top: 4px outset rgb(142, 148, 161);
-            border-right: 4px inset rgb(226, 230, 240);
-            background-color: lightcoral;
+        .busy{            
+            background-color: #6C5B7B;
         }
        
         
@@ -117,7 +106,7 @@
     
 </head>
 <body>
-    <div id="start-scene">  
+    <div id="start-scene" style="display:none">  
         <h1>TETRIS</h1>
         <h2>PRESS ENTER</h2>
     </div>

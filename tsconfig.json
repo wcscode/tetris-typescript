@@ -1,8 +1,8 @@
 {
   "compilerOptions": {
-    "target": "ES6",                          
-    "module": "AMD", 
-   // "outFile": "./build/compilado.js",                   
+    "target": "ES2015",                          
+    "module": "ES2015", 
+    //"outFile": "./build/main.js",                   
     "lib": ["DOM","ES6"],                     
     "allowJs": true,
     "outDir": "build",                          
