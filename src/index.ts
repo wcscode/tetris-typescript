@@ -1,37 +1,42 @@
-import * as f from './functions.js';
-import Game from 'game';
-import Board from 'board';
+//import * as f from './functions.js';
+import { Game, GameConfig }  from './Game.js';
+import Scene from './Scene.js';
+import Board from './Board.js';
+import { IPiece, OPiece, LPiece, SPiece } from './Piece.js';
 
+const playScene = new Scene('play');
+const board = new Board('board');
+const iPiece = new IPiece();
+const oPiece = new OPiece();
+const lPiece = new LPiece();
+const sPiece = new SPiece();
 
-Game.load(() => {
-    
-});
+playScene.add(board);
+playScene.add(iPiece);
+playScene.add(oPiece);
+playScene.add(lPiece);
+playScene.add(sPiece);
 
-Game.update((deltaTime: number) => {
-
-});
-
-Game.render(() => {
-
-});
-
-
-const load = (): void =>  {
-
-    board =  document.getElementById('board') || new HTMLElement();
-
-
-    loop(0);
+function build() 
+{
+    playScene.build(); 
 }
 
-function update(dt: number) 
+function update(deltaTime: number) 
 {
-    const counter: number = f.counter(dt, 10, .6);
+    playScene.update(deltaTime); 
 }
 
 function render()
 {
-   
+    playScene.render();
 }
 
-
+const config: GameConfig = {
+    build: build, 
+    update: update,
+    render: render
+} 
+ 
+const game = new Game(config);
+game.init();

@@ -1,8 +1,9 @@
-export const setCellBusy = (board, x, y, busy) => { board.children[y].children[x].setAttribute("data-busy", busy); };
+export const setCellBusy = (board, x, y, busy) => {
+    board.children[y].children[x].setAttribute("data-busy", busy.toString());
+};
 export const getCell = (board, x, y) => board.children[y].children[x];
 export const countdownScene = (board, ct) => {
     board.children[0];
-    // setAttribute("data-busy", true);
 };
 let accDeltaTime = 0;
 let acc = 0;

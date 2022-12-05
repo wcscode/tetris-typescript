@@ -1,33 +1,37 @@
-export default class Game
-{    
-    static _functionUpdate: Function;
-    static _functionRender: Function;
+export class Game
+{ 
+    private readonly _build: Function;    
+    private readonly _update: ((deltaTime: number) => void);
+    private readonly _render: Function;
 
-    static load(functionInit: () => void)
-    {
+    constructor(config: GameConfig)
+    { 
+        this._build = config.build;
+        this._update = config.update;
+        this._render = config.render;
 
-    }
+        this._build();
+    } 
 
-    static update(functionUpdate: (deltaTime: number) => void) 
-    {
-        this._functionUpdate = functionUpdate;
-    }
-    
-    static render(functionRender: () => void) 
-    {        
-        this._functionRender = functionRender;
-    }
-       
-    static _loop = (timestamp: number): void => {
+    private _loop = (timestamp: number): void => {
 
        const deltaTime: number = 1 // f.getDeltaTime(timestamp);
         
-        this._functionUpdate(deltaTime);
-        this._functionRender(deltaTime);        
-       
+       this._update(deltaTime);
+       this._render();
+        
         window.requestAnimationFrame(this._loop);    
     }
     
-    
-   // window.addEventListener('load', loadGame);
+    init() 
+    {
+        this._loop(0);
+    }
+}
+
+export interface  GameConfig
+{   
+    build: Function;
+    update: (deltaTime: number) => void;
+    render: Function;
 }
