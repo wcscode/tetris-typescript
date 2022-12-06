@@ -27,6 +27,7 @@
             color: white;
             flex-direction: column;          
         }
+        
         @keyframes blink {
            0%{
              opacity: 0;
@@ -41,6 +42,7 @@
              opacity: 1;
            }
         }
+
         #start-scene  h1 {  font-size: 6rem; }
         #start-scene  h2 {  font-size: 2rem; font-weight: 100; animation: blink 1s linear infinite; }
 
@@ -55,7 +57,7 @@
 
         #board
         { 
-            height: 510px;               
+          /*  height: 510px; */              
             width: 300px;
             background-color:  #F8B195;
             /*border-right:1px solid  #F67280;  */                  
@@ -63,7 +65,7 @@
 
         #painel
         {           
-            height: 510px;          
+           /* height: 510px;*/          
             width: 200px;
             background-color: #F67280;   
             padding: 2rem; 
@@ -71,6 +73,7 @@
             flex-direction: column;
             justify-content: space-around;    
         }
+
         #score,
         #next{            
             text-align: center;
@@ -89,6 +92,7 @@
             height: 30px;
         
         }
+
         board-cell
         {
             display: absolute;
@@ -97,10 +101,15 @@
             border: solid 1px #F67280;
         }
 
-        .busy{            
-            background-color: #6C5B7B;
+        board-cell[data-status="fixed"]
+        {
+            background-color: #C06C84;
         }
-       
+
+        board-cell[data-status="busy"]
+        {
+            background-color: #6C5B7B;
+        }      
         
     </style>
     

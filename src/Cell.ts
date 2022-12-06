@@ -1,14 +1,14 @@
-export default class Cell extends HTMLElement{
+export type cellStatus = 'empty' | 'busy' | 'fixed';
 
-    constructor(index: number, isBusy: boolean)
+export class Cell extends HTMLElement{
+
+    constructor(index: number, cellStatus: cellStatus = 'empty')
     {
         super();
-
-        const cell: HTMLDivElement = document.createElement('div');
-
-        cell.className = "cell";
-        cell.setAttribute("data-busy", "false");
-        cell.setAttribute("data-id", index.toString());
+ 
+        this.className = "cell";
+        this.setAttribute("data-status", cellStatus);       
+        this.setAttribute("data-id", index.toString());
     }
 }
 customElements.define("board-cell", Cell);

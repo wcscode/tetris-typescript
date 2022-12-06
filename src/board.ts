@@ -1,4 +1,4 @@
-import Cell from "./Cell.js";
+import { Cell, cellStatus } from "./Cell.js";
 import ILoop from "./ILoop.js";
 import Row from "./Row.js";
 
@@ -7,8 +7,14 @@ export default class Board implements ILoop
     private readonly _board: HTMLElement;   
     private readonly _numColumn: number;
     private readonly _numRow: number;
+    private static _busy = [
+         0,  1,  2,  7,  8,  9,
+        10, 11, 12, 17, 18, 19,
+        20, 21, 22, 27, 28, 29,
+        30, 31, 32, 37, 38, 39,
+    ];
 
-    constructor(boardId: string, numColumn: number = 10, numRow: number = 17) 
+    constructor({boardId, numColumn = 10, numRow = 17} : {boardId: string, numColumn: number, numRow: number}) 
     {
         const board: HTMLElement | null = document.getElementById(boardId);
         
@@ -29,7 +35,8 @@ export default class Board implements ILoop
             for (let x: number = 0; x < this._numColumn; ++x) 
             {
                 const index: number = parseInt(y.toString() + x.toString());
-                const cell = new Cell(index, false);
+                const cellStatus: cellStatus = Board._busy.some((value => value == index)) ? 'fixed' : 'empty';                
+                const cell = new Cell(index, cellStatus);
                 
                 row.appendChild<Cell>(cell);
             }
@@ -53,8 +60,8 @@ export default class Board implements ILoop
             {
                 const cell: Element = this._board.children[y].children[x];                
 
-                if(cell.getAttribute("data-busy") === "true")
-                    cell.classList.add("busy");
+               // if(cell.getAttribute("data-busy") === "true")
+                //    cell.classList.add("busy");
             }
         }
     }

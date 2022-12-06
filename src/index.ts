@@ -5,7 +5,7 @@ import Board from './Board.js';
 import { IPiece, OPiece, LPiece, SPiece } from './Piece.js';
 
 const playScene = new Scene('play');
-const board = new Board('board');
+const board = new Board({ boardId: 'board', numRow: 20, numColumn: 10 });
 const iPiece = new IPiece();
 const oPiece = new OPiece();
 const lPiece = new LPiece();
