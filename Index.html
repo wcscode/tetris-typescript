@@ -27,7 +27,7 @@
             color: white;
             flex-direction: column;          
         }
-        
+
         @keyframes blink {
            0%{
              opacity: 0;
@@ -81,10 +81,25 @@
             font-weight: 500;
             letter-spacing: .5rem;
             background-color:#C06C84;
-            padding: .5rem 0 .5rem 0;
+            text-align: center;
+            
+        }
+        #next span {
+            display: block;
+            padding: .5rem;
+            box-shadow: 0 0px 1rem #00000070 inset;
+            text-align: center;
         }
 
-        #next { height: 300px; }
+        #next board-cell {
+             background-color:  #F8B195;             
+        }
+
+        #score {
+            padding: .5rem 0 .5rem 0;
+            box-shadow: 0 0px 1rem #00000070 inset;
+        }
+        #next { padding: 0; }
         board-row
         {
             display: flex;
@@ -124,7 +139,9 @@
             <div id="board"></div>        
             <div id="painel">
                 <div id="score">0000</div>
-                <div id="next">!</div>
+                <div id="next">
+                    <span>NEXT</span>
+                </div>
             </div>
         </div>
     </div>
