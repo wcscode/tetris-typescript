@@ -3,11 +3,11 @@ import ILoop from "./ILoop.js";
 export default class Scene implements ILoop
 {
     private _gamesObjects: ILoop[] = [];
-    private _name: string;
+    public readonly name: string;  
 
     constructor(name: string)
     {
-        this._name = name;
+        this.name = name;       
     }
 
     build(): void

@@ -1,2 +1,2 @@
-const BOARD_ID = 'board';
-const CELL_CLASS_NAME = 'cell';
+export const SCENE_START_NAME = 'start-scene';
+export const SCENE_PLAY_NAME = 'play-scene';

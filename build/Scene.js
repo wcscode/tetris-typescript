@@ -1,7 +1,7 @@
 export default class Scene {
     constructor(name) {
         this._gamesObjects = [];
-        this._name = name;
+        this.name = name;
     }
     build() {
         this._gamesObjects.forEach(gameObjct => gameObjct.build());

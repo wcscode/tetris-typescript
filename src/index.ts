@@ -3,42 +3,70 @@ import { Game, GameConfig }  from './Game.js';
 import Scene from './Scene.js';
 import Board from './Board.js';
 import { IPiece, OPiece, LPiece, SPiece } from './Piece.js';
+import SceneManager from './SceneManager.js';
+import * as CONST from './const.js';
 
-const playScene = new Scene('play');
-const board = new Board({ boardId: 'board', numRow: 20, numColumn: 10 });
-const nextBoard = new Board({ boardId: 'next', numRow: 4, numColumn: 4 });
-const iPiece = new IPiece();
-const oPiece = new OPiece();
-const lPiece = new LPiece();
-const sPiece = new SPiece();
+window.addEventListener('load', () => {
+    
+    const board = new Board({ boardId: 'board', numRow: 20, numColumn: 10 });
+    const nextBoard = new Board({ boardId: 'next', numRow: 6, numColumn: 6 });
 
-playScene.add(board);
-playScene.add(nextBoard);
-playScene.add(iPiece);
-playScene.add(oPiece);
-playScene.add(lPiece);
-playScene.add(sPiece);
+    //ADD START SCENE ELEMENTS
+    const startScene = new Scene(CONST.SCENE_START_NAME);
 
-function build() 
-{
-    playScene.build(); 
-}
+    SceneManager.add(startScene);
 
-function update(deltaTime: number) 
-{
-    playScene.update(deltaTime); 
-}
+    //ADD PLAY SCENE ELEMENTS
+    const playScene = new Scene(CONST.SCENE_PLAY_NAME);
+    
+    playScene.add(board);
+    playScene.add(nextBoard);
+    playScene.add(new IPiece());
+    playScene.add(new OPiece());   
 
-function render()
-{
-    playScene.render();
-}
+    SceneManager.add(playScene);   
 
-const config: GameConfig = {
-    build: build, 
-    update: update,
-    render: render
-} 
- 
-const game = new Game(config);
-game.init();
+    //SET ACTIVE SCENE
+    SceneManager.setActive(CONST.SCENE_START_NAME);   
+
+    /*const countdown: HTMLElement | null = document.getElementById('countdown');
+
+    if(countdown == null)
+        throw new Error('Start scene container not found!');
+    
+    countdown.addEventListener('keypress', (e) => {
+        
+        if(e.key === 'enter')
+        {
+
+        }
+
+        
+    });*/
+
+    let scene = SceneManager.getActive();
+
+    function build() 
+    {
+        scene.build(); 
+    }
+
+    function update(deltaTime: number) 
+    {
+        scene.update(deltaTime); 
+    }
+
+    function render()
+    {
+        scene.render();
+    }
+
+    const config: GameConfig = {
+        build: build, 
+        update: update,
+        render: render
+    } 
+    
+    const game = new Game(config);
+    game.init();
+});
