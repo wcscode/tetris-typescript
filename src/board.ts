@@ -1,5 +1,5 @@
 import { Cell, cellStatus } from "./Cell.js";
-import ILoop from "./ILoop.js";
+import ILoop from "./Engine/ILoop.js";
 import Row from "./Row.js";
 
 export default class Board implements ILoop

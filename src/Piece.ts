@@ -1,4 +1,4 @@
-import ILoop from "./ILoop.js";
+import ILoop from "./Engine/ILoop.js";
 
 abstract class Piece implements ILoop
 {
