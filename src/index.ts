@@ -15,7 +15,9 @@ window.addEventListener('load', () => {
         CONST.EVENT_CODE_KEY_W,
         CONST.EVENT_CODE_KEY_ENTER
     );
-    
+
+    InputManager.listen();    
+
     SceneManager.add(new StartScene(CONST.SCENE_START_CONTAINER_ID));    
     SceneManager.add(new PlayScene(CONST.SCENE_PLAY_CONTAINER_ID));   
 
