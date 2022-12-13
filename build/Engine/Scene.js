@@ -8,6 +8,10 @@ export default class Scene {
             throw new Error('Container not found!');
         this.container = container;
     }
+    // abstract build(): void;
+    build() {
+        this._gamesObjects.forEach(gameObject => gameObject.build());
+    }
     update(deltaTime) {
         this._gamesObjects.forEach(gameObject => gameObject.update(deltaTime));
     }

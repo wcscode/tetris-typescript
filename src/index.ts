@@ -22,7 +22,7 @@ window.addEventListener('load', () => {
     SceneManager.add(new PlayScene(CONST.SCENE_PLAY_CONTAINER_ID));   
 
     //SET ACTIVE SCENE
-    //SceneManager.setActive(CONST.SCENE_START_CONTAINER_ID); 
+   // SceneManager.setActive(CONST.SCENE_START_CONTAINER_ID); 
     SceneManager.setActive(CONST.SCENE_PLAY_CONTAINER_ID);
     let scene = SceneManager.getActive();
 

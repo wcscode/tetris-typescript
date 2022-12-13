@@ -11,7 +11,7 @@ export default abstract class Scene implements ILoop
     {
         this.containerId = containerId;
         this.isActive = false;
-        const container = document.getElementById(containerId);
+        const container: HTMLElement | null = document.getElementById(containerId);
 
         if(container == null)
             throw new Error('Container not found!');
@@ -19,7 +19,11 @@ export default abstract class Scene implements ILoop
         this.container = container;       
     }   
 
-    abstract build(): void;
+   // abstract build(): void;
+   build(): void
+   {
+       this._gamesObjects.forEach(gameObject => gameObject.build());
+   }
 
     update(deltaTime: number): void
     {
