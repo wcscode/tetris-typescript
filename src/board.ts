@@ -41,8 +41,27 @@ export default class Board implements ILoop
                 row.appendChild<Cell>(cell);
             }
             
-            this._board.appendChild<Row>(row);
+            this._board.appendChild<Row>(row);          
         }
+
+        this.setCell(8, 3);
+    }
+
+    setCell(x: number, y: number): void
+    {
+        const index: number = this._numColumn * y + x;
+    
+        const cell: HTMLElement | null = document.querySelector<HTMLElement>(`[data-id="${index}"]`);
+
+        if(cell == null)
+            throw new Error('Cell not found!');
+
+        cell.dataset.status = "busy";       
+    }
+
+    getCell(x: number, y: number): Cell
+    {
+        return new Cell(0);
     }
 
     update(deltaTime: number): void 

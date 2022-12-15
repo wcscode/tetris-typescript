@@ -20,6 +20,18 @@ export default class Board {
             }
             this._board.appendChild(row);
         }
+        this.setCell(8, 3);
+    }
+    setCell(x, y) {
+        const index = this._numColumn * y + x;
+        console.log(index);
+        const cell = document.querySelector(`[data-id="${index}"]`);
+        if (cell == null)
+            throw new Error('Cell not found!');
+        cell.dataset.status = "busy";
+    }
+    getCell(x, y) {
+        return new Cell(0);
     }
     update(deltaTime) {
     }
