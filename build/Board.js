@@ -2,6 +2,7 @@ import { Cell } from "./Cell.js";
 import Row from "./Row.js";
 export default class Board {
     constructor({ boardId, numColumn = 10, numRow = 17 }) {
+        this._boardId = boardId;
         const board = document.getElementById(boardId);
         if (board == null)
             throw new Error('Object board not found');
@@ -20,12 +21,11 @@ export default class Board {
             }
             this._board.appendChild(row);
         }
-        this.setCell(8, 3);
     }
     setCell(x, y) {
         const index = this._numColumn * y + x;
         console.log(index);
-        const cell = document.querySelector(`[data-id="${index}"]`);
+        const cell = document.querySelector(`#${this._boardId} [data-id="${index}"]`);
         if (cell == null)
             throw new Error('Cell not found!');
         cell.dataset.status = "busy";

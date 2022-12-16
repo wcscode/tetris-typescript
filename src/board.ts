@@ -4,7 +4,8 @@ import Row from "./Row.js";
 
 export default class Board implements ILoop
 {
-    private readonly _board: HTMLElement;   
+    private readonly _board: HTMLElement; 
+    private readonly _boardId: string;  
     private readonly _numColumn: number;
     private readonly _numRow: number;
     private static _busy = [
@@ -16,6 +17,8 @@ export default class Board implements ILoop
 
     constructor({boardId, numColumn = 10, numRow = 17} : {boardId: string, numColumn: number, numRow: number}) 
     {
+        this._boardId = boardId;
+
         const board: HTMLElement | null = document.getElementById(boardId);
         
         if(board == null)
@@ -42,16 +45,15 @@ export default class Board implements ILoop
             }
             
             this._board.appendChild<Row>(row);          
-        }
-
-        this.setCell(8, 3);
+        }       
     }
 
     setCell(x: number, y: number): void
     {
         const index: number = this._numColumn * y + x;
-    
-        const cell: HTMLElement | null = document.querySelector<HTMLElement>(`[data-id="${index}"]`);
+        console.log(index);
+
+        const cell: HTMLElement | null = document.querySelector<HTMLElement>(`#${this._boardId} [data-id="${index}"]`);
 
         if(cell == null)
             throw new Error('Cell not found!');
