@@ -2,6 +2,7 @@ import { Cell } from "./Cell.js";
 import Row from "./Row.js";
 export default class Board {
     constructor({ boardId, numColumn = 10, numRow = 17 }) {
+        this._pieces = [];
         this._boardId = boardId;
         const board = document.getElementById(boardId);
         if (board == null)
@@ -9,6 +10,9 @@ export default class Board {
         this._board = board;
         this._numColumn = numColumn;
         this._numRow = numRow;
+    }
+    add(pieces) {
+        this._pieces = pieces;
     }
     getNumColumn() {
         return this._numColumn;

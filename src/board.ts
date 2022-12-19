@@ -1,5 +1,6 @@
 import { Cell, cellStatus } from "./Cell.js";
 import ILoop from "./Engine/ILoop.js";
+import { Piece } from "./Piece.js";
 import Row from "./Row.js";
 
 export default class Board implements ILoop
@@ -8,6 +9,7 @@ export default class Board implements ILoop
     private readonly _boardId: string;  
     private readonly _numColumn: number;
     private readonly _numRow: number;
+    private _pieces: Piece[] = []; 
     private static _busy = [
          0,  1,  2,  7,  8,  9,
         10, 11, 12, 17, 18, 19,
@@ -29,6 +31,11 @@ export default class Board implements ILoop
         this._numRow = numRow; 
     }
 
+    add(pieces: Piece[])
+    {
+        this._pieces = pieces;
+    }
+    
     getNumColumn()
     { 
        return this._numColumn; 

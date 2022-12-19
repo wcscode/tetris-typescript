@@ -1,54 +1,42 @@
-import Board from "./Board.js";
-import ILoop from "./Engine/ILoop.js";
+//type PieceState =  "inactive" | "active" | "waiting";
 
-type PieceState =  "inactive" | "active" | "waiting";
-
-abstract class Piece implements ILoop
+export abstract class Piece// implements ILoop
 {
     protected _pieces: Array<number> = [];
-    protected  _state: PieceState =  "inactive"; 
-    protected  _parentBoard: Board; 
+    // protected  _state: PieceState =  "inactive";   
+    public isNext: boolean = false;
 
-    constructor(parentBoard: Board)
+    getPieces() 
     {
-        this._parentBoard = parentBoard;
-    }
-
-    abstract build(): void;
-
-    update(deltaTime: number): void
-    {
-        this._parentBoard.setCell(1, 1);   
-    }
-
-    render(): void
-    {
-       
-      
-          
-       
-    }
+        return this._pieces;
+    }   
 }
 
 export class IPiece extends Piece
 {
-    build(): void {
-       this._pieces = [
-            0, 0, 1, 0,
-            0, 0, 1, 0,
-            0, 0, 1, 0,
-            0, 0, 1, 0,
-        ]
+    constructor() {
+
+        super();
+
+        this._pieces = [
+                0, 0, 1, 0,
+                0, 0, 1, 0,
+                0, 0, 1, 0,
+                0, 0, 1, 0,
+            ];
     }    
 }
 
 export class OPiece extends Piece
 {
-    build(): void {
+    constructor(){
+
+        super();
+
         this._pieces = [
             0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
+            0, 1, 1, 0,
+            0, 1, 1, 0,
             0, 0, 0, 0,
         ]
     }    
@@ -56,11 +44,14 @@ export class OPiece extends Piece
 
 export class LPiece extends Piece
 {
-    build(): void {
+    constructor() {
+
+        super();
+
         this._pieces = [
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 1, 0,
             0, 0, 0, 0,
         ]
     }    
@@ -68,11 +59,14 @@ export class LPiece extends Piece
 
 export class SPiece extends Piece
 {
-    build(): void {
+    constructor()  {
+
+        super();
+
         this._pieces = [
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 1, 0,
+            0, 0, 1, 0,
             0, 0, 0, 0,
         ]
     }    

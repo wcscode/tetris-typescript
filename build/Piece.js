@@ -1,17 +1,18 @@
-class Piece {
-    constructor(parentBoard) {
+//type PieceState =  "inactive" | "active" | "waiting";
+export class Piece // implements ILoop
+ {
+    constructor() {
         this._pieces = [];
-        this._state = "inactive";
-        this._parentBoard = parentBoard;
+        // protected  _state: PieceState =  "inactive";   
+        this.isNext = false;
     }
-    update(deltaTime) {
-        this._parentBoard.setCell(1, 1);
-    }
-    render() {
+    getPieces() {
+        return this._pieces;
     }
 }
 export class IPiece extends Piece {
-    build() {
+    constructor() {
+        super();
         this._pieces = [
             0, 0, 1, 0,
             0, 0, 1, 0,
@@ -21,31 +22,34 @@ export class IPiece extends Piece {
     }
 }
 export class OPiece extends Piece {
-    build() {
+    constructor() {
+        super();
         this._pieces = [
             0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
+            0, 1, 1, 0,
+            0, 1, 1, 0,
             0, 0, 0, 0,
         ];
     }
 }
 export class LPiece extends Piece {
-    build() {
+    constructor() {
+        super();
         this._pieces = [
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 1, 0,
             0, 0, 0, 0,
         ];
     }
 }
 export class SPiece extends Piece {
-    build() {
+    constructor() {
+        super();
         this._pieces = [
-            0, 0, 0, 0,
-            0, 0, 0, 0,
-            0, 0, 0, 0,
+            0, 1, 0, 0,
+            0, 1, 1, 0,
+            0, 0, 1, 0,
             0, 0, 0, 0,
         ];
     }

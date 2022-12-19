@@ -9,3 +9,8 @@ export const EVENT_CODE_KEY_ARROW_UP: string = 'ArrowUp';
 export const EVENT_CODE_KEY_W: string = 'KeyW';
 export const EVENT_CODE_KEY_ENTER: string = 'Enter';
 
+export const DATA_STATUS: string = 'data-status'; 
+export const DATA_STATUS_BUSY: string = 'busy'; 
+export const DATA_STATUS_EMPTY: string = 'empty'; 
+export const DATA_STATUS_FIXED: string = 'fixed'; 
+
