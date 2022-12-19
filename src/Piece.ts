@@ -1,22 +1,32 @@
+import Board from "./Board.js";
 import ILoop from "./Engine/ILoop.js";
+
+type PieceState =  "inactive" | "active" | "waiting";
 
 abstract class Piece implements ILoop
 {
     protected _pieces: Array<number> = [];
-   
+    protected  _state: PieceState =  "inactive"; 
+    protected  _parentBoard: Board; 
+
+    constructor(parentBoard: Board)
+    {
+        this._parentBoard = parentBoard;
+    }
+
     abstract build(): void;
 
     update(deltaTime: number): void
     {
-
+        this._parentBoard.setCell(1, 1);   
     }
 
     render(): void
     {
-        for(let i: number = 0; i< this._pieces.length; ++i)
-        {
-
-        }
+       
+      
+          
+       
     }
 }
 

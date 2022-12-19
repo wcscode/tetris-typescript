@@ -29,19 +29,37 @@ export default class Board implements ILoop
         this._numRow = numRow; 
     }
 
+    getNumColumn()
+    { 
+       return this._numColumn; 
+    }
+
+    getNumRow()
+    { 
+       return this._numRow; 
+    }
+
+    getBoard(): HTMLElement
+    {
+        return this._board;
+    }
+
     build(): void 
     {
+        let index = 0;
+
         for (let y: number = 0; y < this._numRow; ++y) 
         {
             const row = new Row();
 
             for (let x: number = 0; x < this._numColumn; ++x) 
-            {
-                const index: number = parseInt(y.toString() + x.toString());
+            {                
                 const cellStatus: cellStatus = Board._busy.some((value => value == index)) ? 'fixed' : 'empty';                
                 const cell = new Cell(index, cellStatus);
                 
                 row.appendChild<Cell>(cell);
+
+                index++;
             }
             
             this._board.appendChild<Row>(row);          
@@ -51,7 +69,7 @@ export default class Board implements ILoop
     setCell(x: number, y: number): void
     {
         const index: number = this._numColumn * y + x;
-        console.log(index);
+       // console.log(index);
 
         const cell: HTMLElement | null = document.querySelector<HTMLElement>(`#${this._boardId} [data-id="${index}"]`);
 
@@ -81,8 +99,8 @@ export default class Board implements ILoop
             {
                 const cell: Element = this._board.children[y].children[x];                
 
-               // if(cell.getAttribute("data-busy") === "true")
-                //    cell.classList.add("busy");
+                if(cell.getAttribute("data-busy") === "true")
+                    cell.classList.add("busy");
             }
         }
     }

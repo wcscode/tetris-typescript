@@ -1,6 +1,7 @@
 export class Game {
     constructor(config) {
         this._loop = (timestamp) => {
+        this._loop = (timestamp) => {
             const deltaTime = 1; // f.getDeltaTime(timestamp);
             this._update(deltaTime);
             this._render();

@@ -10,21 +10,31 @@ export default class Board {
         this._numColumn = numColumn;
         this._numRow = numRow;
     }
+    getNumColumn() {
+        return this._numColumn;
+    }
+    getNumRow() {
+        return this._numRow;
+    }
+    getBoard() {
+        return this._board;
+    }
     build() {
+        let index = 0;
         for (let y = 0; y < this._numRow; ++y) {
             const row = new Row();
             for (let x = 0; x < this._numColumn; ++x) {
-                const index = parseInt(y.toString() + x.toString());
                 const cellStatus = Board._busy.some((value => value == index)) ? 'fixed' : 'empty';
                 const cell = new Cell(index, cellStatus);
                 row.appendChild(cell);
+                index++;
             }
             this._board.appendChild(row);
         }
     }
     setCell(x, y) {
         const index = this._numColumn * y + x;
-        console.log(index);
+        // console.log(index);
         const cell = document.querySelector(`#${this._boardId} [data-id="${index}"]`);
         if (cell == null)
             throw new Error('Cell not found!');
@@ -40,8 +50,8 @@ export default class Board {
             const row = this._board.children[y];
             for (let x = 0; x < this._numColumn; ++x) {
                 const cell = this._board.children[y].children[x];
-                // if(cell.getAttribute("data-busy") === "true")
-                //    cell.classList.add("busy");
+                if (cell.getAttribute("data-busy") === "true")
+                    cell.classList.add("busy");
             }
         }
     }

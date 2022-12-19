@@ -1,12 +1,13 @@
 class Piece {
-    constructor() {
+    constructor(parentBoard) {
         this._pieces = [];
+        this._state = "inactive";
+        this._parentBoard = parentBoard;
     }
     update(deltaTime) {
+        this._parentBoard.setCell(1, 1);
     }
     render() {
-        for (let i = 0; i < this._pieces.length; ++i) {
-        }
     }
 }
 export class IPiece extends Piece {
