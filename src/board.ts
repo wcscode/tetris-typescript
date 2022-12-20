@@ -2,6 +2,7 @@ import { Cell, cellStatus } from "./Cell.js";
 import ILoop from "./Engine/ILoop.js";
 import { Piece } from "./Piece.js";
 import Row from "./Row.js";
+import * as CONST from "./const.js";
 
 export default class Board implements ILoop
 {
@@ -9,6 +10,7 @@ export default class Board implements ILoop
     private readonly _boardId: string;  
     private readonly _numColumn: number;
     private readonly _numRow: number;
+    private _activesPieces: number[] = [];
     private _pieces: Piece[] = []; 
     private static _busy = [
          0,  1,  2,  7,  8,  9,
@@ -31,26 +33,32 @@ export default class Board implements ILoop
         this._numRow = numRow; 
     }
 
+    private _getRandom(): number
+    {
+        return Math.floor(Math.random() * this._pieces.length);
+    }
+
+    setActivePiece() : void 
+    {
+        let activePiece: Piece | undefined = this._pieces.find((piece: Piece) => piece.isNext);
+
+        if(activePiece == null)
+        {
+            activePiece = this._pieces[this._getRandom()];
+        }
+
+        this._pieces.forEach( (piece: Piece, index: number) => {           
+            piece.isActive = activePiece === piece ? true : false;           
+        });
+       
+        this._activesPieces = activePiece.getPieces();
+    }
+
     add(pieces: Piece[])
     {
         this._pieces = pieces;
     }
     
-    getNumColumn()
-    { 
-       return this._numColumn; 
-    }
-
-    getNumRow()
-    { 
-       return this._numRow; 
-    }
-
-    getBoard(): HTMLElement
-    {
-        return this._board;
-    }
-
     build(): void 
     {
         let index = 0;
@@ -70,30 +78,30 @@ export default class Board implements ILoop
             }
             
             this._board.appendChild<Row>(row);          
-        }       
-    }
-
-    setCell(x: number, y: number): void
-    {
-        const index: number = this._numColumn * y + x;
-       // console.log(index);
-
-        const cell: HTMLElement | null = document.querySelector<HTMLElement>(`#${this._boardId} [data-id="${index}"]`);
-
-        if(cell == null)
-            throw new Error('Cell not found!');
-
-        cell.dataset.status = "busy";       
-    }
-
-    getCell(x: number, y: number): Cell
-    {
-        return new Cell(0);
+        }   
+        
+        this.setActivePiece();
     }
 
     update(deltaTime: number): void 
     {
+        let index = 0;
 
+        [0, 1, 2, 3].forEach((y: number) => 
+        { 
+            const row: Element = this._board.children[y];
+
+            [3, 4, 5, 6].forEach((x: number) => 
+            {              
+                if(this._activesPieces[index] == 1)
+                {
+                    const cell: Element = this._board.children[y].children[x];                
+                    cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
+                }
+              
+                index++;              
+            });
+        });  
     }
 
     render(): void 
@@ -106,7 +114,7 @@ export default class Board implements ILoop
             {
                 const cell: Element = this._board.children[y].children[x];                
 
-                if(cell.getAttribute("data-busy") === "true")
+                if(cell.getAttribute(CONST.DATA_STATUS) === "true")
                     cell.classList.add("busy");
             }
         }

@@ -1,7 +1,9 @@
 import { Cell } from "./Cell.js";
 import Row from "./Row.js";
+import * as CONST from "./const.js";
 export default class Board {
     constructor({ boardId, numColumn = 10, numRow = 17 }) {
+        this._activesPieces = [];
         this._pieces = [];
         this._boardId = boardId;
         const board = document.getElementById(boardId);
@@ -11,17 +13,21 @@ export default class Board {
         this._numColumn = numColumn;
         this._numRow = numRow;
     }
+    _getRandom() {
+        return Math.floor(Math.random() * this._pieces.length);
+    }
+    setActivePiece() {
+        let activePiece = this._pieces.find((piece) => piece.isNext);
+        if (activePiece == null) {
+            activePiece = this._pieces[this._getRandom()];
+        }
+        this._pieces.forEach((piece, index) => {
+            piece.isActive = activePiece === piece ? true : false;
+        });
+        this._activesPieces = activePiece.getPieces();
+    }
     add(pieces) {
         this._pieces = pieces;
-    }
-    getNumColumn() {
-        return this._numColumn;
-    }
-    getNumRow() {
-        return this._numRow;
-    }
-    getBoard() {
-        return this._board;
     }
     build() {
         let index = 0;
@@ -35,26 +41,27 @@ export default class Board {
             }
             this._board.appendChild(row);
         }
-    }
-    setCell(x, y) {
-        const index = this._numColumn * y + x;
-        // console.log(index);
-        const cell = document.querySelector(`#${this._boardId} [data-id="${index}"]`);
-        if (cell == null)
-            throw new Error('Cell not found!');
-        cell.dataset.status = "busy";
-    }
-    getCell(x, y) {
-        return new Cell(0);
+        this.setActivePiece();
     }
     update(deltaTime) {
+        let index = 0;
+        [0, 1, 2, 3].forEach((y) => {
+            const row = this._board.children[y];
+            [3, 4, 5, 6].forEach((x) => {
+                if (this._activesPieces[index] == 1) {
+                    const cell = this._board.children[y].children[x];
+                    cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
+                }
+                index++;
+            });
+        });
     }
     render() {
         for (let y = 0; y < this._numRow; ++y) {
             const row = this._board.children[y];
             for (let x = 0; x < this._numColumn; ++x) {
                 const cell = this._board.children[y].children[x];
-                if (cell.getAttribute("data-busy") === "true")
+                if (cell.getAttribute(CONST.DATA_STATUS) === "true")
                     cell.classList.add("busy");
             }
         }

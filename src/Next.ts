@@ -27,9 +27,6 @@ export default class Next implements ILoop
         this._numRow = numRow; 
     }
 
-    private _getRandom(){
-        return Math.floor(Math.random() * this._pieces.length);
-    }
     build(): void 
     {
         let index = 0;
@@ -50,24 +47,26 @@ export default class Next implements ILoop
             this._next.appendChild<Row>(row);          
         }  
         
-        this._nextsPieces = this.getNextPiece();
+        this.setNextPiece();
     }
 
-    getNextPiece() 
+    private _getRandom(): number
+    {
+        return Math.floor(Math.random() * this._pieces.length);
+    }
+
+    setNextPiece(): void 
     {
         const rnd = this._getRandom();
 
-        this._pieces.forEach( (piece: Piece, index:number) => {
+        this._pieces.forEach( (piece: Piece, index: number) => {
             piece.isNext = index == rnd ? true: false;             
         });
         
-        //[rnd].isNext = true;
-        const nextsPieces = this._pieces[rnd].getPieces()
-       
-        return nextsPieces;
+        this._nextsPieces = this._pieces[rnd].getPieces();       
     }
 
-    add(pieces: Piece[])
+    add(pieces: Piece[]): void
     {
         this._pieces = pieces;
     }
@@ -76,11 +75,11 @@ export default class Next implements ILoop
     {
         let index = 0;
 
-        for(let y: number = 1; y < this._numRow -1; ++y)
-        {
+        [1, 2, 3, 4].forEach((y: number) => 
+        {        
             const row: Element = this._next.children[y];
 
-            for(let x = 1; x < this._numColumn -1; ++x)
+            [1, 2, 3, 4].forEach((x: number) => 
             {              
                 if(this._nextsPieces[index] == 1)
                 {
@@ -89,8 +88,8 @@ export default class Next implements ILoop
                 }
               
                 index++;              
-            }
-        }  
+            });
+        });  
     }
 
     render(): void 

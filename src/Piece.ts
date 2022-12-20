@@ -5,6 +5,7 @@ export abstract class Piece// implements ILoop
     protected _pieces: Array<number> = [];
     // protected  _state: PieceState =  "inactive";   
     public isNext: boolean = false;
+    public isActive: boolean = false;
 
     getPieces() 
     {

@@ -5,6 +5,7 @@ export class Piece // implements ILoop
         this._pieces = [];
         // protected  _state: PieceState =  "inactive";   
         this.isNext = false;
+        this.isActive = false;
     }
     getPieces() {
         return this._pieces;

@@ -13,9 +13,6 @@ export default class Next {
         this._numColumn = numColumn;
         this._numRow = numRow;
     }
-    _getRandom() {
-        return Math.floor(Math.random() * this._pieces.length);
-    }
     build() {
         let index = 0;
         for (let y = 0; y < this._numRow; ++y) {
@@ -27,32 +24,33 @@ export default class Next {
             }
             this._next.appendChild(row);
         }
-        this._nextsPieces = this.getNextPiece();
+        this.setNextPiece();
     }
-    getNextPiece() {
+    _getRandom() {
+        return Math.floor(Math.random() * this._pieces.length);
+    }
+    setNextPiece() {
         const rnd = this._getRandom();
         this._pieces.forEach((piece, index) => {
             piece.isNext = index == rnd ? true : false;
         });
-        //[rnd].isNext = true;
-        const nextsPieces = this._pieces[rnd].getPieces();
-        return nextsPieces;
+        this._nextsPieces = this._pieces[rnd].getPieces();
     }
     add(pieces) {
         this._pieces = pieces;
     }
     update(deltaTime) {
         let index = 0;
-        for (let y = 1; y < this._numRow - 1; ++y) {
+        [1, 2, 3, 4].forEach((y) => {
             const row = this._next.children[y];
-            for (let x = 1; x < this._numColumn - 1; ++x) {
+            [1, 2, 3, 4].forEach((x) => {
                 if (this._nextsPieces[index] == 1) {
                     const cell = this._next.children[y].children[x];
                     cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
                 }
                 index++;
-            }
-        }
+            });
+        });
     }
     render() {
         for (let y = 0; y < this._numRow; ++y) {

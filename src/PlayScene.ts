@@ -8,9 +8,9 @@ export default class PlayScene extends Scene
 {   
     build(): void 
     { 
-        const board = new Board({ boardId: 'board', numRow: 20, numColumn: 10 });
-        const next = new Next({ nextId: 'next-board', numRow: 6, numColumn: 6 });       
-
+        const board = new Board({ boardId: 'board', numRow: 20, numColumn: 10 }); 
+        const next = new Next({ nextId: 'next-board', numRow: 6, numColumn: 6 });
+        
         const pieces: Piece[] = [
             new IPiece(),
             new OPiece(),
