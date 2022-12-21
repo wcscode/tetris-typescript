@@ -3,9 +3,10 @@ import Row from "./Row.js";
 import * as CONST from "./const.js";
 export default class Board {
     constructor({ boardId, numColumn = 10, numRow = 17 }) {
+        //  this._boardId = boardId;
         this._activesPieces = [];
         this._pieces = [];
-        this._boardId = boardId;
+        this._tick = 0;
         const board = document.getElementById(boardId);
         if (board == null)
             throw new Error('Object board not found');
@@ -15,6 +16,15 @@ export default class Board {
     }
     _getRandom() {
         return Math.floor(Math.random() * this._pieces.length);
+    }
+    _isTick(deltaTime) {
+        if (deltaTime != undefined)
+            this._tick += deltaTime;
+        if (this._tick > 2) {
+            this._tick = 0;
+            return true;
+        }
+        return false;
     }
     setActivePiece() {
         let activePiece = this._pieces.find((piece) => piece.isNext);
@@ -44,25 +54,30 @@ export default class Board {
         this.setActivePiece();
     }
     update(deltaTime) {
-        let index = 0;
-        [0, 1, 2, 3].forEach((y) => {
-            const row = this._board.children[y];
-            [3, 4, 5, 6].forEach((x) => {
-                if (this._activesPieces[index] == 1) {
-                    const cell = this._board.children[y].children[x];
-                    cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
-                }
-                index++;
+        if (this._isTick(deltaTime)) {
+            let index = 0;
+            [0, 1, 2, 3].forEach((y) => {
+                const row = this._board.children[y];
+                [3, 4, 5, 6].forEach((x) => {
+                    if (this._activesPieces[index] == 1) {
+                        const cell = this._board.children[y].children[x];
+                        cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
+                    }
+                    index++;
+                });
             });
-        });
+        }
     }
     render() {
-        for (let y = 0; y < this._numRow; ++y) {
-            const row = this._board.children[y];
-            for (let x = 0; x < this._numColumn; ++x) {
-                const cell = this._board.children[y].children[x];
-                if (cell.getAttribute(CONST.DATA_STATUS) === "true")
-                    cell.classList.add("busy");
+        //  console.log('tick render')
+        if (this._isTick()) {
+            for (let y = 0; y < this._numRow; ++y) {
+                const row = this._board.children[y];
+                for (let x = 0; x < this._numColumn; ++x) {
+                    const cell = this._board.children[y].children[x];
+                    if (cell.getAttribute(CONST.DATA_STATUS) === "true")
+                        cell.classList.add("busy");
+                }
             }
         }
     }
