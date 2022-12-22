@@ -23,9 +23,7 @@ export default class Board implements ILoop
 
    
     constructor({boardId, numColumn = 10, numRow = 17} : {boardId: string, numColumn: number, numRow: number}) 
-    {
-      //  this._boardId = boardId;
-
+    {     
         const board: HTMLElement | null = document.getElementById(boardId);
         
         if(board == null)
@@ -40,12 +38,13 @@ export default class Board implements ILoop
     {
         return Math.floor(Math.random() * this._pieces.length);
     }
+
     private _isTick(deltaTime?: number): boolean
     {
         if(deltaTime != undefined)
             this._tick += deltaTime;
 
-        if(this._tick > 2)
+        if(this._tick > .3)
         {          
             this._tick = 0;
 
@@ -55,7 +54,7 @@ export default class Board implements ILoop
         return false;
     }
 
-    setActivePiece() : void 
+    private _setActivePiece() : void 
     {
         let activePiece: Piece | undefined = this._pieces.find((piece: Piece) => piece.isNext);
 
@@ -71,6 +70,47 @@ export default class Board implements ILoop
         this._activesPieces = activePiece.getPieces();
     }
 
+    private _setPieceStatus(yPosition: number[], cellStatus: cellStatus): void
+    {
+        let index = 0;
+           
+        yPosition.forEach((y: number) => 
+        {            
+            [3, 4, 5, 6].forEach((x: number) => 
+            {              
+                if(this._activesPieces[index] == 1)                    
+                    Cell.setStatus(this._board, x, y, cellStatus);                    
+            
+                index++;              
+            });
+        }); 
+    }
+
+    private _willCollide(newYPosition: number[]): boolean
+    {
+        let index = 0;
+
+        newYPosition.forEach((y: number) => 
+        {    
+         
+            if(y >= this._numRow)    {         
+                console.log(y + ' '+ this._numRow)
+                return true;         
+            }           
+                        
+            [3, 4, 5, 6].forEach((x: number) => 
+            {                     
+                if(this._activesPieces[index] == 1)                    
+                    if(Cell.getStatus(this._board, x, y) == 'busy')
+                        return true;                    
+            
+                index++;              
+            });
+        }); 
+
+        return false;
+
+    }
     add(pieces: Piece[])
     {
         this._pieces = pieces;
@@ -97,54 +137,28 @@ export default class Board implements ILoop
             this._board.appendChild<Row>(row);          
         }   
         
-        this.setActivePiece();
+        this._setActivePiece();
     }
-
+   
     update(deltaTime: number): void 
     {
         if(this._isTick(deltaTime))
         {
-            let index = 0;
-           
-            this._oldYPosition.forEach((y: number) => 
-            {            
-                [3, 4, 5, 6].forEach((x: number) => 
-                {              
-                    if(this._activesPieces[index] == 1)
-                    {
-                        const cell: Element = this._board.children[y].children[x];                
-                        cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_EMPTY);
-                    }
-                
-                    index++;              
-                });
-            }); 
+            this._setPieceStatus(this._oldYPosition, CONST.DATA_STATUS_EMPTY);
 
-            index = 0;
-
-            const newPosition = this._oldYPosition.map(m => m + 1);
-
-            newPosition.forEach((y: number) => 
-            {            
-                [3, 4, 5, 6].forEach((x: number) => 
-                {              
-                    if(this._activesPieces[index] == 1)
-                    {
-                        const cell: Element = this._board.children[y].children[x];                
-                        cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
-                    }
-                
-                    index++;              
-                });
-            }); 
+            let newYPosition = this._oldYPosition.map(m => m + 1);
             
-            this._oldYPosition = newPosition;          
+            if(this._willCollide(newYPosition))
+                newYPosition = this._oldYPosition;              
+
+            this._setPieceStatus(newYPosition, CONST.DATA_STATUS_BUSY);
+
+            this._oldYPosition = newYPosition;          
         }
     }
 
     render(): void 
-    {
-    //  console.log('tick render')
+    {  
         if(this._isTick())
         {   
             for(let y: number = 0; y < this._numRow; ++y)

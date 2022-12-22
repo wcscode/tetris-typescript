@@ -1,3 +1,5 @@
+import { cellStatus } from "./Cell";
+
 export const SCENE_START_CONTAINER_ID: string = 'start-scene';
 export const SCENE_PLAY_CONTAINER_ID: string = 'play-scene';
 export const COUNTDOWN_CONTAINER_ID: string = 'countdown';
@@ -10,7 +12,7 @@ export const EVENT_CODE_KEY_W: string = 'KeyW';
 export const EVENT_CODE_KEY_ENTER: string = 'Enter';
 
 export const DATA_STATUS: string = 'data-status'; 
-export const DATA_STATUS_BUSY: string = 'busy'; 
-export const DATA_STATUS_EMPTY: string = 'empty'; 
-export const DATA_STATUS_FIXED: string = 'fixed'; 
+export const DATA_STATUS_BUSY: cellStatus = 'busy'; 
+export const DATA_STATUS_EMPTY: cellStatus = 'empty'; 
+export const DATA_STATUS_FIXED: cellStatus = 'fixed'; 
 

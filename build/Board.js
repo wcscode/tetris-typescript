@@ -3,7 +3,6 @@ import Row from "./Row.js";
 import * as CONST from "./const.js";
 export default class Board {
     constructor({ boardId, numColumn = 10, numRow = 17 }) {
-        //  this._boardId = boardId;
         this._activesPieces = [];
         this._pieces = [];
         this._tick = 0;
@@ -21,13 +20,13 @@ export default class Board {
     _isTick(deltaTime) {
         if (deltaTime != undefined)
             this._tick += deltaTime;
-        if (this._tick > 2) {
+        if (this._tick > .3) {
             this._tick = 0;
             return true;
         }
         return false;
     }
-    setActivePiece() {
+    _setActivePiece() {
         let activePiece = this._pieces.find((piece) => piece.isNext);
         if (activePiece == null) {
             activePiece = this._pieces[this._getRandom()];
@@ -36,6 +35,32 @@ export default class Board {
             piece.isActive = activePiece === piece ? true : false;
         });
         this._activesPieces = activePiece.getPieces();
+    }
+    _setPieceStatus(yPosition, cellStatus) {
+        let index = 0;
+        yPosition.forEach((y) => {
+            [3, 4, 5, 6].forEach((x) => {
+                if (this._activesPieces[index] == 1)
+                    Cell.setStatus(this._board, x, y, cellStatus);
+                index++;
+            });
+        });
+    }
+    _willCollide(newYPosition) {
+        let index = 0;
+        newYPosition.forEach((y) => {
+            if (y >= this._numRow) {
+                console.log(y + ' ' + this._numRow);
+                return true;
+            }
+            [3, 4, 5, 6].forEach((x) => {
+                if (this._activesPieces[index] == 1)
+                    if (Cell.getStatus(this._board, x, y) == 'busy')
+                        return true;
+                index++;
+            });
+        });
+        return false;
     }
     add(pieces) {
         this._pieces = pieces;
@@ -52,36 +77,19 @@ export default class Board {
             }
             this._board.appendChild(row);
         }
-        this.setActivePiece();
+        this._setActivePiece();
     }
     update(deltaTime) {
         if (this._isTick(deltaTime)) {
-            let index = 0;
-            this._oldYPosition.forEach((y) => {
-                [3, 4, 5, 6].forEach((x) => {
-                    if (this._activesPieces[index] == 1) {
-                        const cell = this._board.children[y].children[x];
-                        cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_EMPTY);
-                    }
-                    index++;
-                });
-            });
-            index = 0;
-            const newPosition = this._oldYPosition.map(m => m + 1);
-            newPosition.forEach((y) => {
-                [3, 4, 5, 6].forEach((x) => {
-                    if (this._activesPieces[index] == 1) {
-                        const cell = this._board.children[y].children[x];
-                        cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
-                    }
-                    index++;
-                });
-            });
-            this._oldYPosition = newPosition;
+            this._setPieceStatus(this._oldYPosition, CONST.DATA_STATUS_EMPTY);
+            let newYPosition = this._oldYPosition.map(m => m + 1);
+            if (this._willCollide(newYPosition))
+                newYPosition = this._oldYPosition;
+            this._setPieceStatus(newYPosition, CONST.DATA_STATUS_BUSY);
+            this._oldYPosition = newYPosition;
         }
     }
     render() {
-        //  console.log('tick render')
         if (this._isTick()) {
             for (let y = 0; y < this._numRow; ++y) {
                 const row = this._board.children[y];
