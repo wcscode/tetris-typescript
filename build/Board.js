@@ -7,6 +7,7 @@ export default class Board {
         this._activesPieces = [];
         this._pieces = [];
         this._tick = 0;
+        this._oldYPosition = [0, 1, 2, 3];
         const board = document.getElementById(boardId);
         if (board == null)
             throw new Error('Object board not found');
@@ -56,8 +57,18 @@ export default class Board {
     update(deltaTime) {
         if (this._isTick(deltaTime)) {
             let index = 0;
-            [0, 1, 2, 3].forEach((y) => {
-                const row = this._board.children[y];
+            this._oldYPosition.forEach((y) => {
+                [3, 4, 5, 6].forEach((x) => {
+                    if (this._activesPieces[index] == 1) {
+                        const cell = this._board.children[y].children[x];
+                        cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_EMPTY);
+                    }
+                    index++;
+                });
+            });
+            index = 0;
+            const newPosition = this._oldYPosition.map(m => m + 1);
+            newPosition.forEach((y) => {
                 [3, 4, 5, 6].forEach((x) => {
                     if (this._activesPieces[index] == 1) {
                         const cell = this._board.children[y].children[x];
@@ -66,6 +77,7 @@ export default class Board {
                     index++;
                 });
             });
+            this._oldYPosition = newPosition;
         }
     }
     render() {

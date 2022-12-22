@@ -18,9 +18,10 @@ export default class Board implements ILoop
         20, 21, 22, 27, 28, 29,
         30, 31, 32, 37, 38, 39,
     ];
-    private _tick: number = 0;
+    private _tick: number = 0;   
+    private _oldYPosition: number[] = [0, 1, 2, 3];
 
-
+   
     constructor({boardId, numColumn = 10, numRow = 17} : {boardId: string, numColumn: number, numRow: number}) 
     {
       //  this._boardId = boardId;
@@ -104,11 +105,27 @@ export default class Board implements ILoop
         if(this._isTick(deltaTime))
         {
             let index = 0;
+           
+            this._oldYPosition.forEach((y: number) => 
+            {            
+                [3, 4, 5, 6].forEach((x: number) => 
+                {              
+                    if(this._activesPieces[index] == 1)
+                    {
+                        const cell: Element = this._board.children[y].children[x];                
+                        cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_EMPTY);
+                    }
+                
+                    index++;              
+                });
+            }); 
 
-            [0, 1, 2, 3].forEach((y: number) => 
-            { 
-                const row: Element = this._board.children[y];
+            index = 0;
 
+            const newPosition = this._oldYPosition.map(m => m + 1);
+
+            newPosition.forEach((y: number) => 
+            {            
                 [3, 4, 5, 6].forEach((x: number) => 
                 {              
                     if(this._activesPieces[index] == 1)
@@ -119,7 +136,9 @@ export default class Board implements ILoop
                 
                     index++;              
                 });
-            });  
+            }); 
+            
+            this._oldYPosition = newPosition;          
         }
     }
 
@@ -127,9 +146,7 @@ export default class Board implements ILoop
     {
     //  console.log('tick render')
         if(this._isTick())
-        {
-          
-            
+        {   
             for(let y: number = 0; y < this._numRow; ++y)
             {
                 const row: Element = this._board.children[y];
