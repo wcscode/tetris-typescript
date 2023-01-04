@@ -1,6 +1,6 @@
 import { Cell, cellStatus } from "./Cell.js";
 import ILoop from "./Engine/ILoop.js";
-import { Piece } from "./Piece.js";
+import { Tetromino } from "./Tetromino.js";
 import Row from "./Row.js";
 import * as CONST from "./const.js";
 
@@ -10,8 +10,8 @@ export default class Board implements ILoop
   //  private readonly _boardId: string;  
     private readonly _numColumn: number;
     private readonly _numRow: number;
-    private _activesPieces: number[] = [];
-    private _pieces: Piece[] = []; 
+    private _activesTetrominos: number[] = [];
+    private _tetromino: Tetromino; 
     private static _busy = [
          0,  1,  2,  7,  8,  9,
         10, 11, 12, 17, 18, 19,
@@ -36,7 +36,7 @@ export default class Board implements ILoop
 
     private _getRandom(): number
     {
-        return Math.floor(Math.random() * this._pieces.length);
+        return Math.floor(Math.random() * this._tetrominos.length);
     }
 
     private _isTick(deltaTime?: number): boolean
@@ -54,23 +54,23 @@ export default class Board implements ILoop
         return false;
     }
 
-    private _setActivePiece() : void 
+    private _setActiveTetromino() : void 
     {
-        let activePiece: Piece | undefined = this._pieces.find((piece: Piece) => piece.isNext);
+        let activeTetromino: Tetromino | undefined = this._tetrominos.find((Tetromino: Tetromino) => Tetromino.isNext);
 
-        if(activePiece == null)
+        if(activeTetromino == null)
         {
-            activePiece = this._pieces[this._getRandom()];
+            activeTetromino = this._tetrominos[this._getRandom()];
         }
 
-        this._pieces.forEach( (piece: Piece, index: number) => {           
-            piece.isActive = activePiece === piece ? true : false;           
+        this._tetrominos.forEach( (Tetromino: Tetromino, index: number) => {           
+            Tetromino.isActive = activeTetromino === Tetromino ? true : false;           
         });
        
-        this._activesPieces = activePiece.getPieces();
+        this._activesTetrominos = activeTetromino.getTetrominos();
     }
 
-    private _setPieceStatus(yPosition: number[], cellStatus: cellStatus): void
+    private _setTetrominoStatus(yPosition: number[], cellStatus: cellStatus): void
     {
         let index = 0;
            
@@ -78,7 +78,7 @@ export default class Board implements ILoop
         {            
             [3, 4, 5, 6].forEach((x: number) => 
             {              
-                if(this._activesPieces[index] == 1)                    
+                if(this._activesTetrominos[index] == 1)                    
                     Cell.setStatus(this._board, x, y, cellStatus);                    
             
                 index++;              
@@ -93,14 +93,14 @@ export default class Board implements ILoop
         newYPosition.forEach((y: number) => 
         {    
          
-            if(y >= this._numRow)    {         
-                console.log(y + ' '+ this._numRow)
+            if(y >= this._numRow)    
+            { 
                 return true;         
             }           
                         
             [3, 4, 5, 6].forEach((x: number) => 
             {                     
-                if(this._activesPieces[index] == 1)                    
+                if(this._activesTetrominos[index] == 1)                    
                     if(Cell.getStatus(this._board, x, y) == 'busy')
                         return true;                    
             
@@ -109,11 +109,11 @@ export default class Board implements ILoop
         }); 
 
         return false;
-
     }
-    add(pieces: Piece[])
+
+    add(tetromino: Tetromino)
     {
-        this._pieces = pieces;
+        this._tetromino = tetromino;
     }
     
     build(): void 
@@ -137,21 +137,22 @@ export default class Board implements ILoop
             this._board.appendChild<Row>(row);          
         }   
         
-        this._setActivePiece();
+        this._setActiveTetromino();
     }
    
     update(deltaTime: number): void 
     {
         if(this._isTick(deltaTime))
         {
-            this._setPieceStatus(this._oldYPosition, CONST.DATA_STATUS_EMPTY);
+            this._setTetrominoStatus(this._oldYPosition, CONST.DATA_STATUS_EMPTY);
 
             let newYPosition = this._oldYPosition.map(m => m + 1);
             
-            if(this._willCollide(newYPosition))
-                newYPosition = this._oldYPosition;              
+            if(this._willCollide(newYPosition)){
+                newYPosition = this._oldYPosition;
+            }              
 
-            this._setPieceStatus(newYPosition, CONST.DATA_STATUS_BUSY);
+            this._setTetrominoStatus(newYPosition, CONST.DATA_STATUS_BUSY);
 
             this._oldYPosition = newYPosition;          
         }

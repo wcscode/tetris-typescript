@@ -1,25 +1,36 @@
 //type PieceState =  "inactive" | "active" | "waiting";
 
-export abstract class Piece// implements ILoop
-{
-    protected _pieces: Array<number> = [];
+import ILoop from "./Engine/ILoop";
+
+export abstract class Tetromino implements ILoop
+{   
+    protected _tetrominos: Array<number> = [];
     // protected  _state: PieceState =  "inactive";   
     public isNext: boolean = false;
     public isActive: boolean = false;
 
+    build(): void {
+        throw new Error("Method not implemented.");
+    }
+    update(deltaTime: number): void {
+        throw new Error("Method not implemented.");
+    }
+    render(): void {
+        throw new Error("Method not implemented.");
+    }
     getPieces() 
     {
-        return this._pieces;
+        return this._tetrominos;
     }   
 }
 
-export class IPiece extends Piece
+export class ITetromino extends Tetromino
 {
     constructor() {
 
         super();
 
-        this._pieces = [
+        this._tetrominos = [
                 0, 0, 1, 0,
                 0, 0, 1, 0,
                 0, 0, 1, 0,
@@ -28,13 +39,13 @@ export class IPiece extends Piece
     }    
 }
 
-export class OPiece extends Piece
+export class OTetromino extends Tetromino
 {
     constructor(){
 
         super();
 
-        this._pieces = [
+        this._tetrominos = [
             0, 0, 0, 0,
             0, 1, 1, 0,
             0, 1, 1, 0,
@@ -43,13 +54,13 @@ export class OPiece extends Piece
     }    
 }
 
-export class LPiece extends Piece
+export class LTetromino extends Tetromino
 {
     constructor() {
 
         super();
 
-        this._pieces = [
+        this._tetrominos = [
             0, 1, 0, 0,
             0, 1, 0, 0,
             0, 1, 1, 0,
@@ -58,13 +69,13 @@ export class LPiece extends Piece
     }    
 }
 
-export class SPiece extends Piece
+export class STetromino extends Tetromino
 {
     constructor()  {
 
         super();
 
-        this._pieces = [
+        this._tetrominos = [
             0, 1, 0, 0,
             0, 1, 1, 0,
             0, 0, 1, 0,

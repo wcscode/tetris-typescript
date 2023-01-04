@@ -1,6 +1,6 @@
 import { Cell } from "./Cell.js";
 import ILoop from "./Engine/ILoop.js";
-import { Piece } from "./Piece.js";
+import { Tetromino, ITetromino, LTetromino, OTetromino, STetromino  } from "./Tetromino.js";
 import Row from "./Row.js";
 import * as CONST from "./const.js";
 
@@ -10,8 +10,9 @@ export default class Next implements ILoop
     private readonly _nextId: string;  
     private readonly _numColumn: number;
     private readonly _numRow: number; 
-    private _pieces: Piece[] = []; 
-    private _nextsPieces: Array<number> = [];
+    private _nextTetromino: Tetromino;
+    private _tetrominos: Tetromino[] = [];  
+    private _nextsTetrominos: Array<number> = [];
 
     constructor({nextId, numColumn = 10, numRow = 17} : {nextId: string, numColumn: number, numRow: number}) 
     {
@@ -25,6 +26,13 @@ export default class Next implements ILoop
         this._next = next;
         this._numColumn = numColumn;
         this._numRow = numRow; 
+
+        this._tetrominos = [
+            new ITetromino(),
+            new OTetromino(),
+            new LTetromino(),
+            new STetromino()
+        ];
     }
 
     build(): void 
@@ -47,28 +55,22 @@ export default class Next implements ILoop
             this._next.appendChild<Row>(row);          
         }  
         
-        this.setNextPiece();
+        this.setNextTetromino();
     }
 
     private _getRandom(): number
     {
-        return Math.floor(Math.random() * this._pieces.length);
+        return Math.floor(Math.random() * this._tetrominos.length);
     }
 
-    setNextPiece(): void 
+    getNextTetromino(): Tetromino
     {
-        const rnd = this._getRandom();
-
-        this._pieces.forEach( (piece: Piece, index: number) => {
-            piece.isNext = index == rnd ? true: false;             
-        });
-        
-        this._nextsPieces = this._pieces[rnd].getPieces();       
+       return this._nextTetromino;
     }
 
-    add(pieces: Piece[]): void
+    setNextTetromino(): void
     {
-        this._pieces = pieces;
+        this._nextTetromino = this._tetrominos[this._getRandom()];
     }
 
     update(deltaTime: number): void 
@@ -81,11 +83,8 @@ export default class Next implements ILoop
 
             [1, 2, 3, 4].forEach((x: number) => 
             {              
-                if(this._nextsPieces[index] == 1)
-                {
-                    const cell: Element = this._next.children[y].children[x];                
-                    cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
-                }
+                if(this._nextsTetrominos[index] == 1)                
+                    Cell.setStatus(this._next, x, y, 'busy');
               
                 index++;              
             });
