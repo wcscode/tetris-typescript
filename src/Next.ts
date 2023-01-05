@@ -33,6 +33,8 @@ export default class Next implements ILoop
             new LTetromino(),
             new STetromino()
         ];
+
+        this._nextTetromino = this._tetrominos[this._getRandom()];
     }
 
     build(): void 
@@ -54,8 +56,6 @@ export default class Next implements ILoop
             
             this._next.appendChild<Row>(row);          
         }  
-        
-        this.setNextTetromino();
     }
 
     private _getRandom(): number
@@ -75,18 +75,14 @@ export default class Next implements ILoop
 
     update(deltaTime: number): void 
     {
-        let index = 0;
-
         [1, 2, 3, 4].forEach((y: number) => 
         {        
             const row: Element = this._next.children[y];
 
             [1, 2, 3, 4].forEach((x: number) => 
             {              
-                if(this._nextsTetrominos[index] == 1)                
+                if(this._nextTetromino.getCellStatus(x - 1, y - 1) === 'busy')                
                     Cell.setStatus(this._next, x, y, 'busy');
-              
-                index++;              
             });
         });  
     }

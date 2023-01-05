@@ -1,13 +1,14 @@
 //type PieceState =  "inactive" | "active" | "waiting";
 
+import { cellStatus } from "./Cell";
 import ILoop from "./Engine/ILoop";
 
 export abstract class Tetromino implements ILoop
 {   
     protected _tetrominos: Array<number> = [];
     // protected  _state: PieceState =  "inactive";   
-    public isNext: boolean = false;
-    public isActive: boolean = false;
+   // public isNext: boolean = false;
+    //public isActive: boolean = false;
 
     build(): void {
         throw new Error("Method not implemented.");
@@ -21,6 +22,10 @@ export abstract class Tetromino implements ILoop
     getPieces() 
     {
         return this._tetrominos;
+    }   
+    getCellStatus(x: number, y: number) :cellStatus
+    {        
+        return this._tetrominos[(3 * y) + x] == 0 ? 'empty' : 'busy';        
     }   
 }
 

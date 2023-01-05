@@ -1,10 +1,11 @@
 import { Cell } from "./Cell.js";
+import { ITetromino, LTetromino, OTetromino, STetromino } from "./Tetromino.js";
 import Row from "./Row.js";
 import * as CONST from "./const.js";
 export default class Next {
     constructor({ nextId, numColumn = 10, numRow = 17 }) {
-        this._pieces = [];
-        this._nextsPieces = [];
+        this._tetrominos = [];
+        this._nextsTetrominos = [];
         this._nextId = nextId;
         const next = document.getElementById(nextId);
         if (next == null)
@@ -12,6 +13,13 @@ export default class Next {
         this._next = next;
         this._numColumn = numColumn;
         this._numRow = numRow;
+        this._tetrominos = [
+            new ITetromino(),
+            new OTetromino(),
+            new LTetromino(),
+            new STetromino()
+        ];
+        this._nextTetromino = this._tetrominos[this._getRandom()];
     }
     build() {
         let index = 0;
@@ -24,31 +32,22 @@ export default class Next {
             }
             this._next.appendChild(row);
         }
-        this.setNextPiece();
     }
     _getRandom() {
-        return Math.floor(Math.random() * this._pieces.length);
+        return Math.floor(Math.random() * this._tetrominos.length);
     }
-    setNextPiece() {
-        const rnd = this._getRandom();
-        this._pieces.forEach((piece, index) => {
-            piece.isNext = index == rnd ? true : false;
-        });
-        this._nextsPieces = this._pieces[rnd].getPieces();
+    getNextTetromino() {
+        return this._nextTetromino;
     }
-    add(pieces) {
-        this._pieces = pieces;
+    setNextTetromino() {
+        this._nextTetromino = this._tetrominos[this._getRandom()];
     }
     update(deltaTime) {
-        let index = 0;
         [1, 2, 3, 4].forEach((y) => {
             const row = this._next.children[y];
             [1, 2, 3, 4].forEach((x) => {
-                if (this._nextsPieces[index] == 1) {
-                    const cell = this._next.children[y].children[x];
-                    cell.setAttribute(CONST.DATA_STATUS, CONST.DATA_STATUS_BUSY);
-                }
-                index++;
+                if (this._nextTetromino.getCellStatus(x - 1, y - 1) === 'busy')
+                    Cell.setStatus(this._next, x, y, 'busy');
             });
         });
     }

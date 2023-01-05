@@ -3,8 +3,7 @@ import Row from "./Row.js";
 import * as CONST from "./const.js";
 export default class Board {
     constructor({ boardId, numColumn = 10, numRow = 17 }) {
-        this._activesPieces = [];
-        this._pieces = [];
+        this._activesTetrominos = [];
         this._tick = 0;
         this._oldYPosition = [0, 1, 2, 3];
         const board = document.getElementById(boardId);
@@ -14,9 +13,10 @@ export default class Board {
         this._numColumn = numColumn;
         this._numRow = numRow;
     }
-    _getRandom() {
-        return Math.floor(Math.random() * this._pieces.length);
-    }
+    /* private _getRandom(): number
+     {
+         return Math.floor(Math.random() * this._tetrominos.length);
+     }*/
     _isTick(deltaTime) {
         if (deltaTime != undefined)
             this._tick += deltaTime;
@@ -26,21 +26,26 @@ export default class Board {
         }
         return false;
     }
-    _setActivePiece() {
-        let activePiece = this._pieces.find((piece) => piece.isNext);
-        if (activePiece == null) {
-            activePiece = this._pieces[this._getRandom()];
-        }
-        this._pieces.forEach((piece, index) => {
-            piece.isActive = activePiece === piece ? true : false;
-        });
-        this._activesPieces = activePiece.getPieces();
-    }
-    _setPieceStatus(yPosition, cellStatus) {
+    /* private _setActiveTetromino() : void
+     {
+         let activeTetromino: Tetromino | undefined = this._tetrominos.find((Tetromino: Tetromino) => Tetromino.isNext);
+ 
+         if(activeTetromino == null)
+         {
+             activeTetromino = this._tetrominos[this._getRandom()];
+         }
+ 
+         this._tetrominos.forEach( (Tetromino: Tetromino, index: number) => {
+             Tetromino.isActive = activeTetromino === Tetromino ? true : false;
+         });
+        
+         this._activesTetrominos = activeTetromino.getTetrominos();
+     }*/
+    _setTetrominoStatus(yPosition, cellStatus) {
         let index = 0;
         yPosition.forEach((y) => {
             [3, 4, 5, 6].forEach((x) => {
-                if (this._activesPieces[index] == 1)
+                if (this._activesTetrominos[index] == 1)
                     Cell.setStatus(this._board, x, y, cellStatus);
                 index++;
             });
@@ -50,11 +55,10 @@ export default class Board {
         let index = 0;
         newYPosition.forEach((y) => {
             if (y >= this._numRow) {
-                console.log(y + ' ' + this._numRow);
                 return true;
             }
             [3, 4, 5, 6].forEach((x) => {
-                if (this._activesPieces[index] == 1)
+                if (this._activesTetrominos[index] == 1)
                     if (Cell.getStatus(this._board, x, y) == 'busy')
                         return true;
                 index++;
@@ -62,8 +66,8 @@ export default class Board {
         });
         return false;
     }
-    add(pieces) {
-        this._pieces = pieces;
+    add(tetromino) {
+        this._tetromino = tetromino;
     }
     build() {
         let index = 0;
@@ -77,15 +81,16 @@ export default class Board {
             }
             this._board.appendChild(row);
         }
-        this._setActivePiece();
+        //  this._setActiveTetromino();
     }
     update(deltaTime) {
         if (this._isTick(deltaTime)) {
-            this._setPieceStatus(this._oldYPosition, CONST.DATA_STATUS_EMPTY);
+            this._setTetrominoStatus(this._oldYPosition, CONST.DATA_STATUS_EMPTY);
             let newYPosition = this._oldYPosition.map(m => m + 1);
-            if (this._willCollide(newYPosition))
+            if (this._willCollide(newYPosition)) {
                 newYPosition = this._oldYPosition;
-            this._setPieceStatus(newYPosition, CONST.DATA_STATUS_BUSY);
+            }
+            this._setTetrominoStatus(newYPosition, CONST.DATA_STATUS_BUSY);
             this._oldYPosition = newYPosition;
         }
     }

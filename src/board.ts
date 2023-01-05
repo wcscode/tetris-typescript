@@ -11,7 +11,7 @@ export default class Board implements ILoop
     private readonly _numColumn: number;
     private readonly _numRow: number;
     private _activesTetrominos: number[] = [];
-    private _tetromino: Tetromino; 
+    private _tetromino: Tetromino | undefined; 
     private static _busy = [
          0,  1,  2,  7,  8,  9,
         10, 11, 12, 17, 18, 19,
@@ -34,10 +34,10 @@ export default class Board implements ILoop
         this._numRow = numRow; 
     }
 
-    private _getRandom(): number
+   /* private _getRandom(): number
     {
         return Math.floor(Math.random() * this._tetrominos.length);
-    }
+    }*/
 
     private _isTick(deltaTime?: number): boolean
     {
@@ -54,7 +54,7 @@ export default class Board implements ILoop
         return false;
     }
 
-    private _setActiveTetromino() : void 
+   /* private _setActiveTetromino() : void 
     {
         let activeTetromino: Tetromino | undefined = this._tetrominos.find((Tetromino: Tetromino) => Tetromino.isNext);
 
@@ -68,7 +68,7 @@ export default class Board implements ILoop
         });
        
         this._activesTetrominos = activeTetromino.getTetrominos();
-    }
+    }*/
 
     private _setTetrominoStatus(yPosition: number[], cellStatus: cellStatus): void
     {
@@ -113,11 +113,11 @@ export default class Board implements ILoop
 
     add(tetromino: Tetromino)
     {
-        this._tetromino = tetromino;
+        this._tetromino = tetromino;       
     }
     
     build(): void 
-    {
+    {       
         let index = 0;
 
         for (let y: number = 0; y < this._numRow; ++y) 
@@ -137,7 +137,7 @@ export default class Board implements ILoop
             this._board.appendChild<Row>(row);          
         }   
         
-        this._setActiveTetromino();
+      //  this._setActiveTetromino();
     }
    
     update(deltaTime: number): void 
