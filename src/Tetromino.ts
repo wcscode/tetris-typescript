@@ -24,8 +24,10 @@ export abstract class Tetromino implements ILoop
         return this._tetrominos;
     }   
     getCellStatus(x: number, y: number) :cellStatus
-    {        
-        return this._tetrominos[(3 * y) + x] == 0 ? 'empty' : 'busy';        
+    {     
+     //   console.log(((4 * y) + x) + ' - y ' + y + ' - x ' + x)  
+       // console.log(this._tetrominos[(3 * y) + x])   
+        return this._tetrominos[(4 * y) + x] === 0 ? 'empty' : 'busy';        
     }   
 }
 

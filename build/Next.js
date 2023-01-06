@@ -42,7 +42,10 @@ export default class Next {
     setNextTetromino() {
         this._nextTetromino = this._tetrominos[this._getRandom()];
     }
+    // private _teste:boolean = true;
     update(deltaTime) {
+        //  if(this._teste)
+        //  {
         [1, 2, 3, 4].forEach((y) => {
             const row = this._next.children[y];
             [1, 2, 3, 4].forEach((x) => {
@@ -50,6 +53,8 @@ export default class Next {
                     Cell.setStatus(this._next, x, y, 'busy');
             });
         });
+        //  this._teste = false
+        //  }
     }
     render() {
         for (let y = 0; y < this._numRow; ++y) {

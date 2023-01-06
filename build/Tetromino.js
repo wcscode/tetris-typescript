@@ -19,7 +19,9 @@ export class Tetromino {
         return this._tetrominos;
     }
     getCellStatus(x, y) {
-        return this._tetrominos[(3 * y) + x] == 0 ? 'empty' : 'busy';
+        //   console.log(((4 * y) + x) + ' - y ' + y + ' - x ' + x)  
+        // console.log(this._tetrominos[(3 * y) + x])   
+        return this._tetrominos[(4 * y) + x] === 0 ? 'empty' : 'busy';
     }
 }
 export class ITetromino extends Tetromino {

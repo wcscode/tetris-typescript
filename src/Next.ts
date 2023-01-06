@@ -72,9 +72,11 @@ export default class Next implements ILoop
     {
         this._nextTetromino = this._tetrominos[this._getRandom()];
     }
-
+   // private _teste:boolean = true;
     update(deltaTime: number): void 
     {
+      //  if(this._teste)
+      //  {
         [1, 2, 3, 4].forEach((y: number) => 
         {        
             const row: Element = this._next.children[y];
@@ -84,7 +86,10 @@ export default class Next implements ILoop
                 if(this._nextTetromino.getCellStatus(x - 1, y - 1) === 'busy')                
                     Cell.setStatus(this._next, x, y, 'busy');
             });
-        });  
+        }); 
+        
+      //  this._teste = false
+  //  }
     }
 
     render(): void 
