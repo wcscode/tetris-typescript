@@ -1,14 +1,23 @@
 {
   "name": "tetris",
   "version": "1.0.0",
-  "description": "",
+  "description": "A clone TETRIS game to study typescript",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "author": "",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wcscode/tetris-typescript.git"
+  },
+  "keywords": [
+    "tetris",
+    "typescript"
+  ],
+  "author": "William Cristiano da Silva",
   "license": "ISC",
-  "devDependencies": {
-    "typescript": "^4.9.3"
-  }
+  "bugs": {
+    "url": "https://github.com/wcscode/tetris-typescript/issues"
+  },
+  "homepage": "https://github.com/wcscode/tetris-typescript#readme"
 }
