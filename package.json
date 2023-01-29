@@ -19,5 +19,8 @@
   "bugs": {
     "url": "https://github.com/wcscode/tetris-typescript/issues"
   },
-  "homepage": "https://github.com/wcscode/tetris-typescript#readme"
+  "homepage": "https://github.com/wcscode/tetris-typescript#readme",
+  "devDependencies": {
+    "typescript": "^4.9.4"
+  }
 }
