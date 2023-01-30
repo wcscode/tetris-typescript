@@ -8,14 +8,16 @@ class Board {
         this._width = width;
         this._height = height;
         this._cells = [];
+        let id = 0;
         for (let y = 0; y < this._height; ++y) {
             for (let x = 0; x < this._width; ++x) {
-                let cellStatus = CellStatus.Empty;
+                let status = CellStatus.Empty;
                 if (x == 0 || x == this._width - 1)
-                    cellStatus = CellStatus.Wall;
+                    status = CellStatus.Wall;
                 if (y == this._height - 1)
-                    cellStatus = CellStatus.Wall;
-                this._cells.push(new Cell(x, y, cellStatus));
+                    status = CellStatus.Wall;
+                this._cells.push(new Cell({ id, x, y, status }));
+                ++id;
             }
         }
     }

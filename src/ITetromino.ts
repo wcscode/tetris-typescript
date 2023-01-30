@@ -1,10 +1,14 @@
-import { Cell, CellStatus } from './Cell.js';
+//import { Cell, CellStatus } from './Cell.js';
 import Tetromino from './Tetromino.js';
 
 class ITetromino extends Tetromino{
     constructor() {
         super();
-        this._cells.push(new Cell(2, 1, CellStatus.InMovement))
+
+        this.add({x:2, y:1});
+        this.add({x:2, y:2});
+        this.add({x:2, y:3});
+        this.add({x:2, y:4});        
     }    
 }
 
