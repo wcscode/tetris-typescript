@@ -8,7 +8,7 @@ abstract class Tetromino{
         this._cells = [];
     }
 
-    protected abstract build(): void;
+   // protected abstract build(): void;
 
     getCells = ():Cell[] => this._cells;
 }
