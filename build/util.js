@@ -1,13 +1,35 @@
 import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, I_TETROMINO, TETROMINO_LENGTH } from "./const.js";
+const xyToIndex = (x, y, maxX) => y * maxX + x;
+function indexToXy(index, maxX) {
+    let y = Math.floor(index / maxX);
+    let x = index - maxX * y;
+    return [x, y];
+}
+export function clearTetrominosFromBoard(boards, tetrominosIndices) {
+    for (let i = 0; i < tetrominosIndices.length; i++) {
+        boards[tetrominosIndices[i]] = CELL_EMPTY;
+    }
+}
+export function getTetrominosIndices(boards) {
+    let index = boards.indexOf(CELL_TETROMINO);
+    const indices = [];
+    while (index !== -1) {
+        indices.push(index);
+        index = boards.indexOf(CELL_TETROMINO, index + 1);
+    }
+    return indices;
+}
+export function move(boards, tetrominosIndices, direction) {
+    tetrominosIndices.forEach((index) => {
+        boards[index + BOARD_WIDTH] = CELL_TETROMINO;
+    });
+}
 export function fillBoardWithTetrominoInInitialPosition(boards, tetrominos) {
-    //Try to center the tetromino
-    const yFirstIndex = 0;
-    const yLastIndex = yFirstIndex + TETROMINO_LENGTH;
-    const xFirstIndex = BOARD_WIDTH / 2 - 2;
-    const xLastIndex = xFirstIndex + TETROMINO_LENGTH;
-    for (let y = yFirstIndex; y < yLastIndex; ++y) {
-        for (let x = xFirstIndex; x < xLastIndex; ++x) {
-            boards[y * TETROMINO_LENGTH + x] = CELL_TETROMINO;
+    for (let y = 0; y < TETROMINO_LENGTH; ++y) {
+        for (let x = 0; x < TETROMINO_LENGTH; ++x) {
+            const indexTetromino = xyToIndex(x, y, TETROMINO_LENGTH);
+            const indexBoard = (indexTetromino + TETROMINO_LENGTH) + (y * TETROMINO_LENGTH) * 2;
+            boards[indexBoard] = tetrominos[indexTetromino] == 1 ? CELL_TETROMINO : CELL_EMPTY;
         }
     }
 }
@@ -33,7 +55,7 @@ export function formatToRenderConsole(boards) {
     for (let y = 0; y < BOARD_HEIGHT; ++y) {
         const xBoards = [];
         for (let x = 0; x < BOARD_WIDTH; ++x) {
-            xBoards.push(boards[y * BOARD_WIDTH + x]);
+            xBoards.push(boards[xyToIndex(x, y, BOARD_WIDTH)]);
         }
         newBoards[y] = xBoards;
     }

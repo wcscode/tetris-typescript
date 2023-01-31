@@ -9,65 +9,81 @@ import {
     TETROMINO_LENGTH
 } from "./const.js";
 
-export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetrominos: number[]){
-    //Try to center the tetromino
-    const yFirstIndex = 0;
-    const yLastIndex = yFirstIndex + TETROMINO_LENGTH;
-    const xFirstIndex: number = BOARD_WIDTH / 2 - 2;
-    const xLastIndex: number = xFirstIndex + TETROMINO_LENGTH;
+type direction = "left" | "right" | "down";
+type vec2 = [number, number];
 
-    for(let y: number = yFirstIndex; y < yLastIndex; ++y){
+const xyToIndex = (x:number, y: number, maxX: number ): number => y * maxX + x;
 
-        for(let x: number = xFirstIndex; x < xLastIndex; ++x){
+function indexToXy(index: number, maxX: number ): vec2{
+    let y = Math.floor(index / maxX);   
+    let x = index - maxX * y;
+    return [x, y];
+} 
 
-            boards[y * TETROMINO_LENGTH + x] = CELL_TETROMINO;
-        }
+
+export function clearTetrominosFromBoard(boards: number[], tetrominosIndices: number[]): void {
+    for (let i = 0; i < tetrominosIndices.length; i++) {
+        boards[tetrominosIndices[i]] = CELL_EMPTY;
     }
 }
 
+export function getTetrominosIndices(boards: number[]): number[]{    
+    let index: number = boards.indexOf(CELL_TETROMINO);
+    const indices: number[] = [];
+    while (index !== -1) {
+        indices.push(index);
+        index = boards.indexOf(CELL_TETROMINO, index + 1);
+      }
+    return indices;
+}
+
+export function move(boards: number[], tetrominosIndices: number[], direction: direction){            
+     
+
+      tetrominosIndices.forEach((index: number) => {
+          boards[index +BOARD_WIDTH] = CELL_TETROMINO;
+      })
+
+}
+
+export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetrominos: number[]){
+
+    for(let y: number = 0; y < TETROMINO_LENGTH; ++y){
+        for(let x: number = 0; x < TETROMINO_LENGTH; ++x){
+            const indexTetromino = xyToIndex(x, y, TETROMINO_LENGTH);
+            const indexBoard =  (indexTetromino + TETROMINO_LENGTH) + (y * TETROMINO_LENGTH) * 2;
+            boards[indexBoard] = tetrominos[indexTetromino] == 1 ? CELL_TETROMINO : CELL_EMPTY;
+        }
+    }    
+}
+
+
+
 export function getRandomTetromino(): number[]{
-
     const tetrominos: number[][] = []; 
-
     tetrominos.push(I_TETROMINO);
-
     return tetrominos[Math.floor(Math.random() * tetrominos.length)];
 }
 
 export function buildBoardArray(): number[] {
-
     const boards: number[] = [];
-
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
-
         for(let x: number = 0; x < BOARD_WIDTH; ++x){
-
             let status = CELL_EMPTY;
-
-            if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL;           
-
+            if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
             boards.push(status);
         }
     }
-
     return boards;    
 }
 export function formatToRenderConsole(boards: number[]): number[][]{
-
     const newBoards: number[][] = [];
-
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
-
         const xBoards: number[] = [];
-
         for(let x: number = 0; x < BOARD_WIDTH; ++x){
-
-           xBoards.push(boards[y * BOARD_WIDTH + x])
-           
+           xBoards.push(boards[xyToIndex(x, y, BOARD_WIDTH)]);           
         }
-
         newBoards[y] = xBoards;
     }
-
     return newBoards;
 }
