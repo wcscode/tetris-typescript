@@ -78,7 +78,7 @@ export function move(tetromino: ITetromino, direction: direction): number[] {
 }
 
 export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetromino: ITetromino): number[]{
-    const sideLength = Math.sqrt(tetromino.indices.length);   
+    const sideLength = Math.sqrt(tetromino.indices.length);       
     tetromino.indices.forEach((cell, index) => {
         const coordTetromino: vec2 = indexToXy(index, sideLength);
         const boardIndex: number = xyToIndex(coordTetromino[0], coordTetromino[1], BOARD_WIDTH);       
@@ -99,7 +99,7 @@ export function buildBoardArray(): number[] {
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
         for(let x: number = 0; x < BOARD_WIDTH; ++x){
             let status = CELL_EMPTY;
-          //  if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
+            if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
             boards.push(status);
         }
     }

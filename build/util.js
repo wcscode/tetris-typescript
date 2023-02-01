@@ -1,4 +1,4 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, I_TETROMINO,
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, I_TETROMINO,
 //TETROMINO_LENGTH,
 //  L_TETROMINO
  } from "./const.js";
@@ -73,7 +73,8 @@ export function buildBoardArray() {
     for (let y = 0; y < BOARD_HEIGHT; ++y) {
         for (let x = 0; x < BOARD_WIDTH; ++x) {
             let status = CELL_EMPTY;
-            //  if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
+            if (x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1)
+                status = CELL_WALL;
             boards.push(status);
         }
     }

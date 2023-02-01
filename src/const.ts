@@ -1,8 +1,8 @@
 import { ITetromino } from "./util";
 
 //export const TETROMINO_LENGTH = 4;
-export const BOARD_WIDTH: number = 10;
-export const BOARD_HEIGHT: number = 20;
+export const BOARD_WIDTH: number = 12;
+export const BOARD_HEIGHT: number = 21;
 export const CELL_EMPTY: number = 0;
 export const CELL_WALL: number = 1;
 export const CELL_FROZEN: number = 2;
