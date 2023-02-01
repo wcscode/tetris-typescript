@@ -21,10 +21,17 @@ function indexToXy(index: number, maxX: number ): vec2{
 } 
 
 
-export function clearTetrominosFromBoard(boards: number[], tetrominosIndices: number[]): void {
+export function clearTetrominosFromBoard(boards: number[]): number[] {
+    const tetrominosIndices = getTetrominosIndices(boards);
+    tetrominosIndices.forEach((indice: number) => boards[indice] = CELL_EMPTY )
+    return boards;
+}
+
+export function putTetrominosInsideBoard(boards: number[], tetrominosIndices: number[]): number[] {
     for (let i = 0; i < tetrominosIndices.length; i++) {
-        boards[tetrominosIndices[i]] = CELL_EMPTY;
+        boards[tetrominosIndices[i]] = CELL_TETROMINO;
     }
+    return boards;
 }
 
 export function getTetrominosIndices(boards: number[]): number[]{    
@@ -37,16 +44,18 @@ export function getTetrominosIndices(boards: number[]): number[]{
     return indices;
 }
 
-export function move(boards: number[], tetrominosIndices: number[], direction: direction){            
-     
-
-      tetrominosIndices.forEach((index: number) => {
-          boards[index +BOARD_WIDTH] = CELL_TETROMINO;
-      })
-
+export function move(tetrominosIndices: number[], direction: direction): number[] {
+        switch(direction){
+            case "down":           
+                return tetrominosIndices.map(index => index + BOARD_WIDTH);
+            case "right":            
+                return tetrominosIndices.map(index => index + 1);                
+            case "left":            
+                return tetrominosIndices.map(index => index - 1);      
+        }   
 }
 
-export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetrominos: number[]){
+export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetrominos: number[]): void{
 
     for(let y: number = 0; y < TETROMINO_LENGTH; ++y){
         for(let x: number = 0; x < TETROMINO_LENGTH; ++x){

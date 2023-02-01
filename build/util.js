@@ -5,10 +5,16 @@ function indexToXy(index, maxX) {
     let x = index - maxX * y;
     return [x, y];
 }
-export function clearTetrominosFromBoard(boards, tetrominosIndices) {
+export function clearTetrominosFromBoard(boards) {
+    const tetrominosIndices = getTetrominosIndices(boards);
+    tetrominosIndices.forEach((indice) => boards[indice] = CELL_EMPTY);
+    return boards;
+}
+export function putTetrominosInsideBoard(boards, tetrominosIndices) {
     for (let i = 0; i < tetrominosIndices.length; i++) {
-        boards[tetrominosIndices[i]] = CELL_EMPTY;
+        boards[tetrominosIndices[i]] = CELL_TETROMINO;
     }
+    return boards;
 }
 export function getTetrominosIndices(boards) {
     let index = boards.indexOf(CELL_TETROMINO);
@@ -19,10 +25,15 @@ export function getTetrominosIndices(boards) {
     }
     return indices;
 }
-export function move(boards, tetrominosIndices, direction) {
-    tetrominosIndices.forEach((index) => {
-        boards[index + BOARD_WIDTH] = CELL_TETROMINO;
-    });
+export function move(tetrominosIndices, direction) {
+    switch (direction) {
+        case "down":
+            return tetrominosIndices.map(index => index + BOARD_WIDTH);
+        case "right":
+            return tetrominosIndices.map(index => index + 1);
+        case "left":
+            return tetrominosIndices.map(index => index - 1);
+    }
 }
 export function fillBoardWithTetrominoInInitialPosition(boards, tetrominos) {
     for (let y = 0; y < TETROMINO_LENGTH; ++y) {

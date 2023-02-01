@@ -1,14 +1,17 @@
-import { buildBoardArray, clearTetrominosFromBoard, fillBoardWithTetrominoInInitialPosition, formatToRenderConsole, getRandomTetromino, getTetrominosIndices, move } from "./util.js";
-const boards = buildBoardArray();
+import { buildBoardArray, clearTetrominosFromBoard, fillBoardWithTetrominoInInitialPosition, formatToRenderConsole, getRandomTetromino, getTetrominosIndices, move, putTetrominosInsideBoard } from "./util.js";
+let boards = buildBoardArray();
 const tetrominos = getRandomTetromino();
 fillBoardWithTetrominoInInitialPosition(boards, tetrominos);
 function update() {
     console.clear();
-    const tetrominosIndices = getTetrominosIndices(boards);
-    clearTetrominosFromBoard(boards, tetrominosIndices);
-    move(boards, tetrominosIndices, "down");
-    move(boards, getTetrominosIndices(boards), "down");
+    let tetrominosIndices = getTetrominosIndices(boards);
+    tetrominosIndices = move(tetrominosIndices, "down");
+    tetrominosIndices = move(tetrominosIndices, "right");
+    boards = clearTetrominosFromBoard(boards);
+    boards = putTetrominosInsideBoard(boards, tetrominosIndices);
     console.table(formatToRenderConsole(boards));
 }
 update();
+update();
+//update();
 //setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);
