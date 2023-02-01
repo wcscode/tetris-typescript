@@ -1,17 +1,22 @@
-import { buildBoardArray, clearTetrominosFromBoard, fillBoardWithTetrominoInInitialPosition, formatToRenderConsole, getRandomTetromino, getTetrominosIndices, move, putTetrominosInsideBoard } from "./util.js";
+import { buildBoardArray, clearTetrominosFromBoard, fillBoardWithTetrominoInInitialPosition, formatToRenderConsole, getRandomTetromino, getTetromino, mapOfKeyAndMovements, move, putTetrominosInsideBoard, setInput } from "./util.js";
+const pressedKeys = setInput();
+const inputsMaps = mapOfKeyAndMovements();
 let boards = buildBoardArray();
-const tetrominos = getRandomTetromino();
-fillBoardWithTetrominoInInitialPosition(boards, tetrominos);
+let tetromino = getRandomTetromino();
+boards = fillBoardWithTetrominoInInitialPosition(boards, tetromino);
 function update() {
-    console.clear();
-    let tetrominosIndices = getTetrominosIndices(boards);
-    tetrominosIndices = move(tetrominosIndices, "down");
-    tetrominosIndices = move(tetrominosIndices, "right");
+    //console.clear();      
+    tetromino = getTetromino(boards, tetromino.name);
+    inputsMaps.forEach((direction, key) => {
+        if (pressedKeys.has(key))
+            tetromino.indices = move(tetromino, direction);
+    });
+    //tetrominosIndices = move(tetrominosIndices, "down");  
     boards = clearTetrominosFromBoard(boards);
-    boards = putTetrominosInsideBoard(boards, tetrominosIndices);
+    boards = putTetrominosInsideBoard(boards, tetromino);
     console.table(formatToRenderConsole(boards));
 }
 update();
-update();
+//update();
 //update();
 //setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);

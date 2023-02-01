@@ -6,72 +6,92 @@ import {
     CELL_WALL, 
     CELL_FROZEN, 
     I_TETROMINO,
-    TETROMINO_LENGTH
+    //TETROMINO_LENGTH,
+  //  L_TETROMINO
 } from "./const.js";
 
-type direction = "left" | "right" | "down";
+export type direction = "left" | "right" | "down" | "rotateLeft" | "rotateRight";
+export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
+export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z";
 type vec2 = [number, number];
 
-const xyToIndex = (x:number, y: number, maxX: number ): number => y * maxX + x;
+export interface ITetromino {
+    name: tetrominoName;
+    indices: number[]
+}
 
-function indexToXy(index: number, maxX: number ): vec2{
-    let y = Math.floor(index / maxX);   
-    let x = index - maxX * y;
-    return [x, y];
-} 
+export function mapOfKeyAndMovements(){
+    const mapOfMovements = new Map<key, direction>();
+    mapOfMovements.set("ArrowLeft", "left");
+    mapOfMovements.set("ArrowRight", "right");
+    mapOfMovements.set("ArrowDown", "down");
+    mapOfMovements.set("a", "rotateLeft");    
+    mapOfMovements.set("s", "rotateRight");
+    return mapOfMovements;
+}
 
+export function setInput(): Set<string> {
+    const pressedKeys = new Set<string>();
+    document.addEventListener("keydown", function(event) {    
+        pressedKeys.add(event.key);       
+    });
+    document.addEventListener("keyup", function(event) {
+        pressedKeys.delete(event.key);        
+    });
+    return pressedKeys;
+}
 
 export function clearTetrominosFromBoard(boards: number[]): number[] {
-    const tetrominosIndices = getTetrominosIndices(boards);
-    tetrominosIndices.forEach((indice: number) => boards[indice] = CELL_EMPTY )
+    const {indices} = getTetromino(boards);
+    indices.forEach((indice: number) => boards[indice] = CELL_EMPTY )
     return boards;
 }
 
-export function putTetrominosInsideBoard(boards: number[], tetrominosIndices: number[]): number[] {
-    for (let i = 0; i < tetrominosIndices.length; i++) {
-        boards[tetrominosIndices[i]] = CELL_TETROMINO;
+export function putTetrominosInsideBoard(boards: number[], tetromino: ITetromino): number[] {
+    for (let i = 0; i < tetromino.indices.length; i++) {
+        boards[tetromino.indices[i]] = CELL_TETROMINO;
     }
     return boards;
 }
 
-export function getTetrominosIndices(boards: number[]): number[]{    
+export function getTetromino(boards: number[], tetrominoName?: tetrominoName): ITetromino{    
     let index: number = boards.indexOf(CELL_TETROMINO);
     const indices: number[] = [];
     while (index !== -1) {
         indices.push(index);
         index = boards.indexOf(CELL_TETROMINO, index + 1);
       }
-    return indices;
+    return {name: tetrominoName, indices: indices};  
 }
 
-export function move(tetrominosIndices: number[], direction: direction): number[] {
-        switch(direction){
-            case "down":           
-                return tetrominosIndices.map(index => index + BOARD_WIDTH);
-            case "right":            
-                return tetrominosIndices.map(index => index + 1);                
-            case "left":            
-                return tetrominosIndices.map(index => index - 1);      
-        }   
+export function move(tetromino: ITetromino, direction: direction): number[] {
+    switch(direction){          
+        case "right":
+            return translate(tetromino.indices, 1);                            
+        case "left":            
+            return translate(tetromino.indices, -1);                
+        case "down":           
+            return translate(tetromino.indices, 1 + BOARD_WIDTH);   
+        default:                         
+            return rotate(tetromino.indices, direction);
+    }   
 }
 
-export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetrominos: number[]): void{
-
-    for(let y: number = 0; y < TETROMINO_LENGTH; ++y){
-        for(let x: number = 0; x < TETROMINO_LENGTH; ++x){
-            const indexTetromino = xyToIndex(x, y, TETROMINO_LENGTH);
-            const indexBoard =  (indexTetromino + TETROMINO_LENGTH) + (y * TETROMINO_LENGTH) * 2;
-            boards[indexBoard] = tetrominos[indexTetromino] == 1 ? CELL_TETROMINO : CELL_EMPTY;
-        }
-    }    
+export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetromino: ITetromino): number[]{
+    const sideLength = Math.sqrt(tetromino.indices.length);   
+    tetromino.indices.forEach((cell, index) => {
+        const coordTetromino: vec2 = indexToXy(index, sideLength);
+        const boardIndex: number = xyToIndex(coordTetromino[0], coordTetromino[1], BOARD_WIDTH);       
+        boards[boardIndex] = cell;        
+    });  
+    return boards;
 }
 
-
-
-export function getRandomTetromino(): number[]{
-    const tetrominos: number[][] = []; 
+export function getRandomTetromino(): ITetromino{
+    const tetrominos: ITetromino[] = []; 
     tetrominos.push(I_TETROMINO);
-    return tetrominos[Math.floor(Math.random() * tetrominos.length)];
+    //tetrominos.push(L_TETROMINO);
+    return tetrominos[Math.floor(Math.random() * tetrominos.length)];    
 }
 
 export function buildBoardArray(): number[] {
@@ -79,12 +99,13 @@ export function buildBoardArray(): number[] {
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
         for(let x: number = 0; x < BOARD_WIDTH; ++x){
             let status = CELL_EMPTY;
-            if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
+          //  if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
             boards.push(status);
         }
     }
     return boards;    
 }
+
 export function formatToRenderConsole(boards: number[]): number[][]{
     const newBoards: number[][] = [];
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
@@ -95,4 +116,13 @@ export function formatToRenderConsole(boards: number[]): number[][]{
         newBoards[y] = xBoards;
     }
     return newBoards;
+}
+
+const xyToIndex = (x:number, y: number, maxX: number ): number => y * maxX + x;
+const translate = (indices: number[], position: number): number[] =>  indices.map(index => index + position);
+const rotate = (indices: number[], direction: string): number[] => indices.map(index => index);
+function indexToXy(index: number, maxX: number ): vec2{
+    let y = Math.floor(index / maxX);   
+    let x = index - maxX * y;
+    return [x, y];
 }

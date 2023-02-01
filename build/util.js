@@ -1,52 +1,71 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, I_TETROMINO, TETROMINO_LENGTH } from "./const.js";
-const xyToIndex = (x, y, maxX) => y * maxX + x;
-function indexToXy(index, maxX) {
-    let y = Math.floor(index / maxX);
-    let x = index - maxX * y;
-    return [x, y];
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, I_TETROMINO,
+//TETROMINO_LENGTH,
+//  L_TETROMINO
+ } from "./const.js";
+export function mapOfKeyAndMovements() {
+    const mapOfMovements = new Map();
+    mapOfMovements.set("ArrowLeft", "left");
+    mapOfMovements.set("ArrowRight", "right");
+    mapOfMovements.set("ArrowDown", "down");
+    mapOfMovements.set("a", "rotateLeft");
+    mapOfMovements.set("s", "rotateRight");
+    return mapOfMovements;
+}
+export function setInput() {
+    const pressedKeys = new Set();
+    document.addEventListener("keydown", function (event) {
+        pressedKeys.add(event.key);
+    });
+    document.addEventListener("keyup", function (event) {
+        pressedKeys.delete(event.key);
+    });
+    return pressedKeys;
 }
 export function clearTetrominosFromBoard(boards) {
-    const tetrominosIndices = getTetrominosIndices(boards);
-    tetrominosIndices.forEach((indice) => boards[indice] = CELL_EMPTY);
+    const { indices } = getTetromino(boards);
+    indices.forEach((indice) => boards[indice] = CELL_EMPTY);
     return boards;
 }
-export function putTetrominosInsideBoard(boards, tetrominosIndices) {
-    for (let i = 0; i < tetrominosIndices.length; i++) {
-        boards[tetrominosIndices[i]] = CELL_TETROMINO;
+export function putTetrominosInsideBoard(boards, tetromino) {
+    for (let i = 0; i < tetromino.indices.length; i++) {
+        boards[tetromino.indices[i]] = CELL_TETROMINO;
     }
     return boards;
 }
-export function getTetrominosIndices(boards) {
+export function getTetromino(boards, tetrominoName) {
     let index = boards.indexOf(CELL_TETROMINO);
     const indices = [];
     while (index !== -1) {
         indices.push(index);
         index = boards.indexOf(CELL_TETROMINO, index + 1);
     }
-    return indices;
+    return { name: tetrominoName, indices: indices };
 }
-export function move(tetrominosIndices, direction) {
+export function move(tetromino, direction) {
     switch (direction) {
-        case "down":
-            return tetrominosIndices.map(index => index + BOARD_WIDTH);
         case "right":
-            return tetrominosIndices.map(index => index + 1);
+            return translate(tetromino.indices, 1);
         case "left":
-            return tetrominosIndices.map(index => index - 1);
+            return translate(tetromino.indices, -1);
+        case "down":
+            return translate(tetromino.indices, 1 + BOARD_WIDTH);
+        default:
+            return rotate(tetromino.indices, direction);
     }
 }
-export function fillBoardWithTetrominoInInitialPosition(boards, tetrominos) {
-    for (let y = 0; y < TETROMINO_LENGTH; ++y) {
-        for (let x = 0; x < TETROMINO_LENGTH; ++x) {
-            const indexTetromino = xyToIndex(x, y, TETROMINO_LENGTH);
-            const indexBoard = (indexTetromino + TETROMINO_LENGTH) + (y * TETROMINO_LENGTH) * 2;
-            boards[indexBoard] = tetrominos[indexTetromino] == 1 ? CELL_TETROMINO : CELL_EMPTY;
-        }
-    }
+export function fillBoardWithTetrominoInInitialPosition(boards, tetromino) {
+    const sideLength = Math.sqrt(tetromino.indices.length);
+    tetromino.indices.forEach((cell, index) => {
+        const coordTetromino = indexToXy(index, sideLength);
+        const boardIndex = xyToIndex(coordTetromino[0], coordTetromino[1], BOARD_WIDTH);
+        boards[boardIndex] = cell;
+    });
+    return boards;
 }
 export function getRandomTetromino() {
     const tetrominos = [];
     tetrominos.push(I_TETROMINO);
+    //tetrominos.push(L_TETROMINO);
     return tetrominos[Math.floor(Math.random() * tetrominos.length)];
 }
 export function buildBoardArray() {
@@ -54,8 +73,7 @@ export function buildBoardArray() {
     for (let y = 0; y < BOARD_HEIGHT; ++y) {
         for (let x = 0; x < BOARD_WIDTH; ++x) {
             let status = CELL_EMPTY;
-            if (x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1)
-                status = CELL_WALL;
+            //  if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
             boards.push(status);
         }
     }
@@ -71,4 +89,12 @@ export function formatToRenderConsole(boards) {
         newBoards[y] = xBoards;
     }
     return newBoards;
+}
+const xyToIndex = (x, y, maxX) => y * maxX + x;
+const translate = (indices, position) => indices.map(index => index + position);
+const rotate = (indices, direction) => indices.map(index => index);
+function indexToXy(index, maxX) {
+    let y = Math.floor(index / maxX);
+    let x = index - maxX * y;
+    return [x, y];
 }
