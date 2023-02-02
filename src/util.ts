@@ -49,6 +49,7 @@ export function clearTetrominosFromBoard(boards: number[], tetromino: ITetromino
 }
  
 export function putTetrominosInsideBoard(boards: number[], tetromino: ITetromino): number[] {
+    console.log(tetromino)
     for (let i = 0; i < tetromino.indices.length; i++) {
         boards[tetromino.indices[i]] = CELL_TETROMINO;
     }

@@ -28,6 +28,7 @@ function update(){
         if (pressedKeys.has(key))          
             tetromino.indices = setAction(tetromino, action);       
     });  
+    tetromino.indices = setAction(tetromino, "rotateLeft");
     boards = clearTetrominosFromBoard(boards, tetromino); 
     boards = putTetrominosInsideBoard(boards, tetromino); 
     console.table(formatToRenderConsole(boards));
