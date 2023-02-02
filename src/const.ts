@@ -12,6 +12,7 @@ export const UPDATE_FRAME_IN_MILLISECONDS = 2000;
 export const I_TETROMINO: ITetromino =
 {
     name: "I",    
+    coord: {x:4 , y:0},
     indices: [
         0, CELL_TETROMINO, 0, 0,  
         0, CELL_TETROMINO, 0, 0,  

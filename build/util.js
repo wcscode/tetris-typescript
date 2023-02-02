@@ -2,6 +2,7 @@ import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, I_TET
 //TETROMINO_LENGTH,
 //  L_TETROMINO
  } from "./const.js";
+;
 export function mapOfKeyAndMovements() {
     const mapOfMovements = new Map();
     mapOfMovements.set("ArrowLeft", "left");
@@ -21,8 +22,8 @@ export function setInput() {
     });
     return pressedKeys;
 }
-export function clearTetrominosFromBoard(boards) {
-    const { indices } = getTetromino(boards);
+export function clearTetrominosFromBoard(boards, tetromino) {
+    const { indices } = getTetromino(boards, tetromino);
     indices.forEach((indice) => boards[indice] = CELL_EMPTY);
     return boards;
 }
@@ -32,17 +33,18 @@ export function putTetrominosInsideBoard(boards, tetromino) {
     }
     return boards;
 }
-export function getTetromino(boards, tetrominoName) {
+export function getTetromino(boards, tetromino) {
     let index = boards.indexOf(CELL_TETROMINO);
     const indices = [];
     while (index !== -1) {
         indices.push(index);
         index = boards.indexOf(CELL_TETROMINO, index + 1);
     }
-    return { name: tetrominoName, indices: indices };
+    tetromino.indices = indices;
+    return tetromino;
 }
-export function move(tetromino, direction) {
-    switch (direction) {
+export function setAction(tetromino, action) {
+    switch (action) {
         case "right":
             return translate(tetromino.indices, 1);
         case "left":
@@ -50,14 +52,14 @@ export function move(tetromino, direction) {
         case "down":
             return translate(tetromino.indices, 1 + BOARD_WIDTH);
         default:
-            return rotate(tetromino.indices, direction);
+            return rotate(tetromino.indices, action);
     }
 }
 export function fillBoardWithTetrominoInInitialPosition(boards, tetromino) {
     const sideLength = Math.sqrt(tetromino.indices.length);
     tetromino.indices.forEach((cell, index) => {
-        const coordTetromino = indexToXy(index, sideLength);
-        const boardIndex = xyToIndex(coordTetromino[0], coordTetromino[1], BOARD_WIDTH);
+        const { x, y } = indexToXy(index, sideLength);
+        const boardIndex = xyToIndex(x + tetromino.coord.x, y + tetromino.coord.y, BOARD_WIDTH);
         boards[boardIndex] = cell;
     });
     return boards;
@@ -97,5 +99,5 @@ const rotate = (indices, direction) => indices.map(index => index);
 function indexToXy(index, maxX) {
     let y = Math.floor(index / maxX);
     let x = index - maxX * y;
-    return [x, y];
+    return { x, y };
 }
