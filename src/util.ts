@@ -21,6 +21,19 @@ export interface ITetromino {
     indices: number[];
 }
 
+function translate(tetromino: ITetromino, addCoord: vec2): ITetromino {   
+     
+    const newIndex = xyToIndex(addCoord, BOARD_WIDTH);  
+    tetromino.indices = tetromino.indices.map(index => index + newIndex);    
+    tetromino.coord = addVec2(tetromino.coord, addCoord);  ;
+    return tetromino;
+} 
+
+function rotate(tetromino: ITetromino, direction: string): ITetromino{
+     tetromino.indices = tetromino.indices.map(index => index);
+     return tetromino
+}
+
 export function mapOfKeyAndMovements(){
     const mapOfMovements = new Map<key, action>();
     mapOfMovements.set("ArrowLeft", "left");
@@ -42,14 +55,13 @@ export function setInput(): Set<string> {
     return pressedKeys;
 }
 
-export function clearTetrominosFromBoard(boards: number[], tetromino: ITetromino): number[] {
-    const {indices} = getTetromino(boards, tetromino);
+export function clearTetrominosFromBoard(boards: number[], tetromino: ITetromino): number[] {    
+    const {indices} =  getTetromino(boards, tetromino);   
     indices.forEach((indice: number) => boards[indice] = CELL_EMPTY )
     return boards;
 }
  
-export function putTetrominosInsideBoard(boards: number[], tetromino: ITetromino): number[] {
-    console.log(tetromino)
+export function putTetrominosInsideBoard(boards: number[], tetromino: ITetromino): number[] {      
     for (let i = 0; i < tetromino.indices.length; i++) {
         boards[tetromino.indices[i]] = CELL_TETROMINO;
     }
@@ -63,29 +75,28 @@ export function getTetromino(boards: number[], tetromino: ITetromino): ITetromin
         indices.push(index);
         index = boards.indexOf(CELL_TETROMINO, index + 1);
       }
-
-     tetromino.indices = indices;
-    return tetromino;  
+    return {name: tetromino.name, coord: tetromino.coord, indices: indices};  
 }
 
-export function setAction(tetromino: ITetromino, action: action): number[] {
+export function setAction(tetromino: ITetromino, action: action): ITetromino {
     switch(action){          
         case "right":
-            return translate(tetromino.indices, 1);                            
+            return translate(tetromino, {x:1, y:0});                            
         case "left":            
-            return translate(tetromino.indices, -1);                
+            return translate(tetromino, {x:1, y:0});                
         case "down":           
-            return translate(tetromino.indices, 1 + BOARD_WIDTH);   
+            return translate(tetromino, {x:0, y:1});   
         default:                         
-            return rotate(tetromino.indices, action);
+            return rotate(tetromino, action);
     }   
 }
 
 export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetromino: ITetromino): number[]{
     const sideLength = Math.sqrt(tetromino.indices.length);        
     tetromino.indices.forEach((cell, index) => {
-        const {x, y}: vec2 = indexToXy(index, sideLength);
-        const boardIndex: number = xyToIndex(x + tetromino.coord.x, y + tetromino.coord.y, BOARD_WIDTH);       
+        const defaultCoord: vec2 = indexToXy(index, sideLength);        
+        const offsetCoord = addVec2(defaultCoord, tetromino.coord)
+        const boardIndex: number = xyToIndex(offsetCoord, BOARD_WIDTH);       
         boards[boardIndex] = cell;        
     });  
     return boards;
@@ -115,18 +126,20 @@ export function formatToRenderConsole(boards: number[]): number[][]{
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
         const xBoards: number[] = [];
         for(let x: number = 0; x < BOARD_WIDTH; ++x){
-           xBoards.push(boards[xyToIndex(x, y, BOARD_WIDTH)]);           
+           xBoards.push(boards[xyToIndex({x, y}, BOARD_WIDTH)]);           
         }
         newBoards[y] = xBoards;
     }
     return newBoards;
 }
 
-const xyToIndex = (x:number, y: number, maxX: number ): number => y * maxX + x;
+function xyToIndex(coord:vec2, maxX: number ): number {
+     return coord.y * maxX + coord.x;
+}
 
-const translate = (indices: number[], position: number): number[] =>  indices.map(index => index + position);
-
-const rotate = (indices: number[], direction: string): number[] => indices.map(index => index);
+function addVec2(coord1:vec2, coord2: vec2): vec2 {
+    return {x: coord1.x + coord2.x, y: coord1.y + coord2.y};
+}
 
 function indexToXy(index: number, maxX: number ): vec2{
     let y = Math.floor(index / maxX);   
