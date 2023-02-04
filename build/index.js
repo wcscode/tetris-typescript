@@ -1,21 +1,21 @@
-import { buildBoardArray, clearTetrominosFromBoard, fillBoardWithTetrominoInInitialPosition, formatToRenderConsole, getRandomTetromino, getTetromino, mapOfKeyAndMovements, putTetrominosInsideBoard, setInput, setAction } from "./util.js";
+import { buildBoardArray, clearTetrominosFromBoard, formatToRenderConsole, getRandomTetromino, mapOfKeyAndMovements, setInput, setAction, putTetrominoInsideBoard } from "./util.js";
 const pressedKeys = setInput();
 const inputsMaps = mapOfKeyAndMovements();
-let boards = buildBoardArray();
+let board = buildBoardArray();
 let tetromino = getRandomTetromino();
-boards = fillBoardWithTetrominoInInitialPosition(boards, tetromino);
+board = putTetrominoInsideBoard(board, tetromino);
 function update() {
-    //console.clear();
-    tetromino = getTetromino(boards, tetromino);
+    //console.clear(); 
     inputsMaps.forEach((action, key) => {
         if (pressedKeys.has(key))
             tetromino = setAction(tetromino, action);
     });
-    tetromino = setAction(tetromino, "rotateLeft");
+    const oldTetromino = tetromino;
+    //tetromino = setAction(tetromino, "rotateLeft");
     tetromino = setAction(tetromino, "right");
-    boards = clearTetrominosFromBoard(boards, tetromino);
-    boards = putTetrominosInsideBoard(boards, tetromino);
-    console.table(formatToRenderConsole(boards));
+    board = clearTetrominosFromBoard(board, oldTetromino);
+    board = putTetrominoInsideBoard(board, tetromino);
+    console.table(formatToRenderConsole(board));
 }
 update();
 //update();

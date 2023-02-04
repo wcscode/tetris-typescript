@@ -15,23 +15,19 @@ export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
 export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"; 
 interface vec2 {x: number, y:number};
 
+export interface IBoard{
+    indices: number[];
+}
+
 export interface ITetromino {    
     name: tetrominoName;
     coord: vec2;
     indices: number[];
 }
 
-function translate(tetromino: ITetromino, addCoord: vec2): ITetromino {   
-     
-    const newIndex = xyToIndex(addCoord, BOARD_WIDTH);  
-    tetromino.indices = tetromino.indices.map(index => index + newIndex);    
-    tetromino.coord = addVec2(tetromino.coord, addCoord);  ;
-    return tetromino;
-} 
-
 function rotate(tetromino: ITetromino, direction: string): ITetromino{
      tetromino.indices = tetromino.indices.map(index => index);
-     return tetromino
+     return tetromino;
 }
 
 export function mapOfKeyAndMovements(){
@@ -55,51 +51,51 @@ export function setInput(): Set<string> {
     return pressedKeys;
 }
 
-export function clearTetrominosFromBoard(boards: number[], tetromino: ITetromino): number[] {    
-    const {indices} =  getTetromino(boards, tetromino);   
-    indices.forEach((indice: number) => boards[indice] = CELL_EMPTY )
-    return boards;
-}
- 
-export function putTetrominosInsideBoard(boards: number[], tetromino: ITetromino): number[] {      
-    for (let i = 0; i < tetromino.indices.length; i++) {
-        boards[tetromino.indices[i]] = CELL_TETROMINO;
-    }
-    return boards;
-}
-
-export function getTetromino(boards: number[], tetromino: ITetromino): ITetromino{    
-    let index: number = boards.indexOf(CELL_TETROMINO);
-    const indices: number[] = [];
-    while (index !== -1) {
-        indices.push(index);
-        index = boards.indexOf(CELL_TETROMINO, index + 1);
-      }
-    return {name: tetromino.name, coord: tetromino.coord, indices: indices};  
+export function clearTetrominosFromBoard(board: IBoard, oldTetromino:ITetromino): IBoard {   
+    const {coord, indices} = oldTetromino;
+   
+    const length = Math.sqrt(indices.length);
+    for(let y = 0; y <length; ++y){
+        for(let x = 0; x <length; ++x){
+            if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+                console.log(addVec2({x, y}, coord))
+                board.indices[xyToIndex(addVec2({x, y}, coord), BOARD_WIDTH)] = CELL_EMPTY;  
+            }
+        } 
+    } 
+    return board;
 }
 
 export function setAction(tetromino: ITetromino, action: action): ITetromino {
     switch(action){          
-        case "right":
-            return translate(tetromino, {x:1, y:0});                            
-        case "left":            
-            return translate(tetromino, {x:1, y:0});                
-        case "down":           
-            return translate(tetromino, {x:0, y:1});   
-        default:                         
-            return rotate(tetromino, action);
+        case "right":{
+            tetromino.coord = addVec2(tetromino.coord, {x:1, y:0})
+            break; 
+        }  
+        case "left":{
+            tetromino.coord = addVec2(tetromino.coord, {x:-1, y:0})
+            break; 
+        }    
+        case "down":{
+            tetromino.coord = addVec2(tetromino.coord, {x:0, y:1})
+            break; 
+        }
     }   
+    return tetromino;
 }
 
-export function fillBoardWithTetrominoInInitialPosition(boards: number[], tetromino: ITetromino): number[]{
-    const sideLength = Math.sqrt(tetromino.indices.length);        
-    tetromino.indices.forEach((cell, index) => {
-        const defaultCoord: vec2 = indexToXy(index, sideLength);        
-        const offsetCoord = addVec2(defaultCoord, tetromino.coord)
-        const boardIndex: number = xyToIndex(offsetCoord, BOARD_WIDTH);       
-        boards[boardIndex] = cell;        
-    });  
-    return boards;
+export function putTetrominoInsideBoard(board:IBoard, tetromino: ITetromino): IBoard{
+    const {coord, indices} = tetromino;
+    const length = Math.sqrt(indices.length);
+    for(let y = 0; y <length; ++y){
+        for(let x = 0; x <length; ++x){
+            if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+                board.indices[xyToIndex(addVec2({x, y}, coord), BOARD_WIDTH)] = CELL_TETROMINO;  
+            }
+        } 
+    }  
+    
+    return board;
 }
 
 export function getRandomTetromino(): ITetromino{
@@ -109,24 +105,24 @@ export function getRandomTetromino(): ITetromino{
     return tetrominos[Math.floor(Math.random() * tetrominos.length)];    
 }
 
-export function buildBoardArray(): number[] {
-    const boards: number[] = [];
+export function buildBoardArray(): IBoard {
+    const indices: number[] = [];
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
         for(let x: number = 0; x < BOARD_WIDTH; ++x){
             let status = CELL_EMPTY;
             if(x == 0 || x == BOARD_WIDTH - 1 || y == BOARD_HEIGHT - 1) status = CELL_WALL; 
-            boards.push(status);
+            indices.push(status);
         }
     }
-    return boards;    
+    return {indices: indices};    
 }
 
-export function formatToRenderConsole(boards: number[]): number[][]{
+export function formatToRenderConsole(board: IBoard): number[][]{
     const newBoards: number[][] = [];
     for(let y: number = 0; y < BOARD_HEIGHT; ++y){
         const xBoards: number[] = [];
         for(let x: number = 0; x < BOARD_WIDTH; ++x){
-           xBoards.push(boards[xyToIndex({x, y}, BOARD_WIDTH)]);           
+           xBoards.push(board.indices[xyToIndex({x, y}, BOARD_WIDTH)]);           
         }
         newBoards[y] = xBoards;
     }
