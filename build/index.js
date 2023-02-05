@@ -10,10 +10,11 @@ function update() {
         if (pressedKeys.has(key))
             tetromino = setAction(tetromino, action);
     });
-    const oldTetromino = tetromino;
+    const oldTetromino = Object.assign({}, tetromino);
     //tetromino = setAction(tetromino, "rotateLeft");
-    tetromino = setAction(tetromino, "right");
+    tetromino = setAction(tetromino, "rotateLeft");
     board = clearTetrominosFromBoard(board, oldTetromino);
+    console.log('len ' + board.indices.filter(f => f == 3).length);
     board = putTetrominoInsideBoard(board, tetromino);
     console.table(formatToRenderConsole(board));
 }

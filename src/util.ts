@@ -51,18 +51,20 @@ export function setInput(): Set<string> {
     return pressedKeys;
 }
 
-export function clearTetrominosFromBoard(board: IBoard, oldTetromino:ITetromino): IBoard {   
-    const {coord, indices} = oldTetromino;
-   
+export function clearTetrominosFromBoard(board: IBoard, tetromino:ITetromino): IBoard {   
+    const {coord, indices} = tetromino;   
     const length = Math.sqrt(indices.length);
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){
-            if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
-                console.log(addVec2({x, y}, coord))
-                board.indices[xyToIndex(addVec2({x, y}, coord), BOARD_WIDTH)] = CELL_EMPTY;  
+           if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){             
+                board.indices[xyToIndex(addVec2({x, y}, coord), BOARD_WIDTH)] =  CELL_EMPTY;  
             }
         } 
     } 
+   /* board.indices.forEach( (value, index) => { 
+        if(value == CELL_TETROMINO)
+            board.indices[index] = CELL_EMPTY
+    });*/
     return board;
 }
 
@@ -80,7 +82,28 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             tetromino.coord = addVec2(tetromino.coord, {x:0, y:1})
             break; 
         }
+        case "rotateLeft":{
+            const {indices} = tetromino;
+            const length = Math.sqrt(indices.length);
+            //const indices = tetromino;
+            const currentIndices = Array.from(indices);  
+            //console.log(currentIndices)          
+            for(let y = 0; y <length; ++y){
+                for(let x = 0; x <length; ++x){
+                   // console.log(xyToIndex({x:y, y:x}, length))
+                 //  console.log("In " + xyToIndex({x:x, y:y}, length)+ ' = ' + xyToIndex({x:y, y:x}, length))
+                 //  console.log( tetromino.indices[xyToIndex({x:x, y:y}, length)] + ' = ' + currentIndices[xyToIndex({x:y, y:x}, length)]
+                 //   )
+                  //  console.log(currentIndices)       
+                 
+                    tetromino.indices[xyToIndex({x:x, y:y}, length)] = currentIndices[xyToIndex({x:y, y:x}, length)]
+                 //tetromino.indices[xyToIndex({x:x, y:y}, length)] = 3; 
+                }        
+            }  
+           // console.table(tetromino.indices)
+        }
     }   
+    
     return tetromino;
 }
 
