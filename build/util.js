@@ -1,19 +1,18 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, I_TETROMINO,
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, L_TETROMINO,
 //TETROMINO_LENGTH,
 //  L_TETROMINO
  } from "./const.js";
 ;
-function rotate(tetromino, direction) {
-    tetromino.indices = tetromino.indices.map(index => index);
-    return tetromino;
+export function willCollide(board, tetromino, action) {
+    return true;
 }
 export function mapOfKeyAndMovements() {
     const mapOfMovements = new Map();
     mapOfMovements.set("ArrowLeft", "left");
     mapOfMovements.set("ArrowRight", "right");
     mapOfMovements.set("ArrowDown", "down");
-    mapOfMovements.set("a", "rotateLeft");
-    mapOfMovements.set("s", "rotateRight");
+    mapOfMovements.set("a", "counterClockwise");
+    mapOfMovements.set("s", "clockwise");
     return mapOfMovements;
 }
 export function setInput() {
@@ -26,6 +25,13 @@ export function setInput() {
     });
     return pressedKeys;
 }
+export function preserveTetromino(tetromino) {
+    return {
+        name: tetromino.name,
+        coord: { x: tetromino.coord.x, y: tetromino.coord.y },
+        indices: Array.from(tetromino.indices)
+    };
+}
 export function clearTetrominosFromBoard(board, tetromino) {
     const { coord, indices } = tetromino;
     const length = Math.sqrt(indices.length);
@@ -36,10 +42,6 @@ export function clearTetrominosFromBoard(board, tetromino) {
             }
         }
     }
-    /* board.indices.forEach( (value, index) => {
-         if(value == CELL_TETROMINO)
-             board.indices[index] = CELL_EMPTY
-     });*/
     return board;
 }
 export function setAction(tetromino, action) {
@@ -56,24 +58,30 @@ export function setAction(tetromino, action) {
             tetromino.coord = addVec2(tetromino.coord, { x: 0, y: 1 });
             break;
         }
-        case "rotateLeft": {
+        case "clockwise": {
             const { indices } = tetromino;
             const length = Math.sqrt(indices.length);
-            //const indices = tetromino;
             const currentIndices = Array.from(indices);
-            //console.log(currentIndices)          
-            for (let y = 0; y < length; ++y) {
-                for (let x = 0; x < length; ++x) {
-                    // console.log(xyToIndex({x:y, y:x}, length))
-                    //  console.log("In " + xyToIndex({x:x, y:y}, length)+ ' = ' + xyToIndex({x:y, y:x}, length))
-                    //  console.log( tetromino.indices[xyToIndex({x:x, y:y}, length)] + ' = ' + currentIndices[xyToIndex({x:y, y:x}, length)]
-                    //   )
-                    //  console.log(currentIndices)       
-                    tetromino.indices[xyToIndex({ x: x, y: y }, length)] = currentIndices[xyToIndex({ x: y, y: x }, length)];
-                    //tetromino.indices[xyToIndex({x:x, y:y}, length)] = 3; 
+            let index = 0;
+            for (let x = 0; x < length; ++x) {
+                for (let y = length - 1; y >= 0; --y) {
+                    tetromino.indices[index] = currentIndices[xyToIndex({ x, y }, length)];
+                    ++index;
                 }
             }
-            // console.table(tetromino.indices)
+            break;
+        }
+        case "counterClockwise": {
+            const { indices } = tetromino;
+            const length = Math.sqrt(indices.length);
+            const currentIndices = Array.from(indices);
+            let index = 0;
+            for (let x = length - 1; x >= 0; --x) {
+                for (let y = 0; y < length; ++y) {
+                    tetromino.indices[index] = currentIndices[xyToIndex({ x, y }, length)];
+                    ++index;
+                }
+            }
         }
     }
     return tetromino;
@@ -92,7 +100,7 @@ export function putTetrominoInsideBoard(board, tetromino) {
 }
 export function getRandomTetromino() {
     const tetrominos = [];
-    tetrominos.push(I_TETROMINO);
+    tetrominos.push(L_TETROMINO);
     //tetrominos.push(L_TETROMINO);
     return tetrominos[Math.floor(Math.random() * tetrominos.length)];
 }

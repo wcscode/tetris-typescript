@@ -11,7 +11,9 @@ import {
   ITetromino,
   setAction,
   IBoard,
-  putTetrominoInsideBoard
+  putTetrominoInsideBoard,
+  preserveTetromino,
+  willCollide
 } from "./util.js";
 
 const pressedKeys = setInput();
@@ -20,23 +22,19 @@ let board: IBoard = buildBoardArray();
 let tetromino: ITetromino = getRandomTetromino();
 board = putTetrominoInsideBoard(board, tetromino);
 function update(){
-    //console.clear(); 
+    console.clear(); 
+    const preservedTetromino = preserveTetromino(tetromino);
     inputsMaps.forEach((action: action, key: key) => {        
-        if (pressedKeys.has(key))          
-            tetromino = setAction(tetromino, action);       
-    });  
-    const oldTetromino = {...tetromino};    
-    //tetromino = setAction(tetromino, "rotateLeft");
-    tetromino = setAction(tetromino, "rotateLeft");  
-     
-    board = clearTetrominosFromBoard(board, oldTetromino);  
-    console.log('len '+board.indices.filter(f => f == 3).length)    
-    board = putTetrominoInsideBoard(board, tetromino);     
- 
+        if (pressedKeys.has(key))
+            if(!willCollide(board, tetromino, action))          
+              tetromino = setAction(tetromino, action);       
+    }); 
+    board = clearTetrominosFromBoard(board, preservedTetromino);      
+    board = putTetrominoInsideBoard(board, tetromino);
     console.table(formatToRenderConsole(board));
   }
  
-update();
 //update();
 //update();
-//setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);
+//update();
+setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);
