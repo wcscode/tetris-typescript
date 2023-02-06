@@ -3,8 +3,22 @@ import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, L_TET
 //  L_TETROMINO
  } from "./const.js";
 ;
+function isBusyCell(board, coord) {
+    const freeCellsStates = [CELL_EMPTY, CELL_TETROMINO];
+    return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
+}
 export function willCollide(board, tetromino, action) {
-    return true;
+    const { indices, coord } = setAction({ coord: { x: tetromino.coord.x, y: tetromino.coord.y }, indices: tetromino.indices, name: tetromino.name }, action);
+    const length = Math.sqrt(indices.length);
+    for (let y = 0; y < length; ++y) {
+        for (let x = 0; x < length; ++x) {
+            if (indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO) {
+                if (isBusyCell(board, addVec2({ x, y }, coord)))
+                    return true;
+            }
+        }
+    }
+    return false;
 }
 export function mapOfKeyAndMovements() {
     const mapOfMovements = new Map();
@@ -126,6 +140,41 @@ export function formatToRenderConsole(board) {
         newBoards[y] = xBoards;
     }
     return newBoards;
+}
+export function render(board, tetromino) {
+    const { indices } = tetromino;
+    const length = Math.sqrt(indices.length);
+    for (let y = 0; y < length; ++y) {
+        for (let x = 0; x < length; ++x) {
+            //if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+            const index = xyToIndex(addVec2({ x, y }, tetromino.coord), BOARD_WIDTH);
+            const cell = document.querySelector(`[data-cell-id="${index}"]`);
+            cell.innerHTML = board.indices[index] == 0 ? "" : board.indices[index].toString();
+            if (indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO)
+                cell.style.backgroundColor = '#000';
+            else
+                cell.style.backgroundColor = '#fff';
+            //  }
+        }
+    }
+}
+export function buildDivBoard(board, containerId) {
+    const container = document.getElementById(containerId);
+    if (container == null)
+        throw new Error("Container not found!");
+    for (let y = 0; y < BOARD_HEIGHT; ++y) {
+        const row = document.createElement('div');
+        for (let x = 0; x < BOARD_WIDTH; ++x) {
+            const cell = document.createElement('span');
+            const index = xyToIndex({ x, y }, BOARD_WIDTH).toString();
+            cell.setAttribute("data-cell-id", index);
+            cell.style.display = "inline-block";
+            cell.style.width = cell.style.height = "1.2rem";
+            cell.innerHTML = board.indices[index] == 0 ? "" : board.indices[index];
+            row.append(cell);
+        }
+        container.appendChild(row);
+    }
 }
 function xyToIndex(coord, maxX) {
     return coord.y * maxX + coord.x;

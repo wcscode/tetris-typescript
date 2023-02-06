@@ -7,7 +7,7 @@ export const CELL_EMPTY: number = 0;
 export const CELL_WALL: number = 1;
 export const CELL_FROZEN: number = 2;
 export const CELL_TETROMINO: number = 3;
-export const UPDATE_FRAME_IN_MILLISECONDS = 2000;
+export const UPDATE_FRAME_IN_MILLISECONDS = 1000;
 
 /*export const I_TETROMINO: ITetromino =
 {
@@ -23,7 +23,7 @@ export const UPDATE_FRAME_IN_MILLISECONDS = 2000;
 export const L_TETROMINO: ITetromino =
 {
     name: "L",  
-    coord: {x:4 , y:0},  
+    coord: {x:8 , y:0},  
     indices: [
         0, CELL_TETROMINO, 0,  
         0, CELL_TETROMINO, 0,  

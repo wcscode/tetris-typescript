@@ -25,8 +25,23 @@ export interface ITetromino {
     indices: number[];
 }
 
-export function willCollide(board: IBoard, tetromino: ITetromino, action: action): boolean{
-    return true;   
+function isBusyCell(board: IBoard, coord:vec2): boolean{
+    const freeCellsStates: number[] = [CELL_EMPTY, CELL_TETROMINO];
+    return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
+}
+
+export function willCollide(board: IBoard, tetromino: ITetromino, action: action): boolean{  
+    const {indices, coord} = setAction({coord: {x: tetromino.coord.x, y: tetromino.coord.y }, indices: tetromino.indices, name: tetromino.name}, action);
+    const length = Math.sqrt(indices.length); 
+    for(let y = 0; y <length; ++y){
+        for(let x = 0; x <length; ++x){          
+           if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){                  
+                if(isBusyCell(board, addVec2({x, y}, coord)))
+                    return true;                
+           }
+        } 
+    }
+    return false;  
 }
 
 export function mapOfKeyAndMovements(){
@@ -157,6 +172,43 @@ export function formatToRenderConsole(board: IBoard): number[][]{
         newBoards[y] = xBoards;
     }
     return newBoards;
+}
+export function render(board: IBoard, tetromino:ITetromino) {
+    const {indices} = tetromino;
+    const length = Math.sqrt(indices.length);
+    for(let y = 0; y <length; ++y){
+        for(let x = 0; x <length; ++x){
+            //if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+                const index = xyToIndex(addVec2({x, y}, tetromino.coord), BOARD_WIDTH);                
+                const cell: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
+                cell.innerHTML =  board.indices[index] == 0 ? "" : board.indices[index].toString();                
+                if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO)
+                    cell.style.backgroundColor = '#000'
+                else
+                    cell.style.backgroundColor = '#fff'
+          //  }
+        }
+    }
+}
+
+export function buildDivBoard(board: IBoard, containerId: string): void{
+    const container: HTMLElement | null = document.getElementById(containerId);
+    if(container == null)
+        throw new Error("Container not found!");         
+    for(let y: number = 0; y < BOARD_HEIGHT; ++y){
+        const row: HTMLElement = document.createElement('div');
+        for(let x: number = 0; x < BOARD_WIDTH; ++x){
+           const cell: HTMLElement = document.createElement('span');
+           const index: string = xyToIndex({x, y}, BOARD_WIDTH).toString();
+           cell.setAttribute("data-cell-id", index);
+           cell.style.display = "inline-block";
+           cell.style.width = cell.style.height = "1.2rem";
+
+           cell.innerHTML = board.indices[index] == 0 ? "" : board.indices[index];
+           row.append(cell);           
+        }
+        container.appendChild(row);
+    }   
 }
 
 function xyToIndex(coord:vec2, maxX: number ): number {
