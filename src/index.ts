@@ -12,7 +12,7 @@ import {
   setAction,
   IBoard,
   putTetrominoInsideBoard,
-  preserveTetromino,
+  createDeepCopyFromTetromino,
   willCollide,
   buildDivBoard,
   render
@@ -25,20 +25,23 @@ buildDivBoard(board, "board");
 let tetromino: ITetromino = getRandomTetromino();
 board = putTetrominoInsideBoard(board, tetromino);
 function update(){
-   // console.clear(); 
-    const preservedTetromino = preserveTetromino(tetromino);
+    //console.clear(); 
+    const preservedTetromino = createDeepCopyFromTetromino(tetromino);
     inputsMaps.forEach((action: action, key: key) => {        
-        if (pressedKeys.has(key))
-            if(!willCollide(board, tetromino, action))          
-                tetromino = setAction(tetromino, action);       
+        if (pressedKeys.has(key)){
+            if(!willCollide(board, tetromino, action))            
+                tetromino = setAction(tetromino, action);      
+                
+            } 
     }); 
-    //tetromino = setAction(tetromino, "right");
+    //console.log(willCollide(board, tetromino, "clockwise"))
+    //tetromino = setAction(tetromino, "clockwise");
     //willCollide(board, tetromino, "right");
      
     board = clearTetrominosFromBoard(board, preservedTetromino);      
     board = putTetrominoInsideBoard(board, tetromino);
     //console.table(formatToRenderConsole(board));
-    render(board, tetromino);
+    render(board, preservedTetromino, tetromino);
   }
  
 update();

@@ -10,7 +10,7 @@ import {
   //  L_TETROMINO
 } from "./const.js";
 
-export type action = "left" | "right" | "down" | "clockwise" | "counterClockwise";
+export type action = "left" | "right" | "down" | "up" | "clockwise" | "counterClockwise";
 export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
 export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"; 
 interface vec2 {x: number, y:number};
@@ -30,8 +30,26 @@ function isBusyCell(board: IBoard, coord:vec2): boolean{
     return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
 }
 
+export function tryKick(board: IBoard, tetromino: ITetromino, action: action): action {
+    switch(action){          
+        case "right":{
+            
+            break; 
+        }  
+        case "left":{
+            tetromino.coord = addVec2(tetromino.coord, {x:-1, y:0})
+            break; 
+        }    
+        case "down":{
+            tetromino.coord = addVec2(tetromino.coord, {x:0, y:1})
+            break; 
+        }
+        case "clockwise":{}}
+    return undefined;
+}
+
 export function willCollide(board: IBoard, tetromino: ITetromino, action: action): boolean{  
-    const {indices, coord} = setAction({coord: {x: tetromino.coord.x, y: tetromino.coord.y }, indices: tetromino.indices, name: tetromino.name}, action);
+    const {indices, coord} = setAction(createDeepCopyFromTetromino(tetromino), action);
     const length = Math.sqrt(indices.length); 
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){          
@@ -64,7 +82,7 @@ export function setInput(): Set<string> {
     });
     return pressedKeys;
 }
-export function preserveTetromino(tetromino: ITetromino): ITetromino{
+export function createDeepCopyFromTetromino(tetromino: ITetromino): ITetromino{
     return {
         name: tetromino.name, 
         coord:{x:tetromino.coord.x, y:tetromino.coord.y},        
@@ -117,8 +135,7 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             const currentIndices = Array.from(indices);
             let index = 0;    
             for(let x = length - 1; x >= 0; --x){  
-            for(let y = 0; y < length; ++y){
-                                 
+            for(let y = 0; y < length; ++y){                                 
                     tetromino.indices[index] = currentIndices[xyToIndex({x, y}, length)]
                     ++index;                  
                 }        
@@ -173,20 +190,26 @@ export function formatToRenderConsole(board: IBoard): number[][]{
     }
     return newBoards;
 }
-export function render(board: IBoard, tetromino:ITetromino) {
-    const {indices} = tetromino;
-    const length = Math.sqrt(indices.length);
+export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:ITetromino) {
+   // const {indices} = tetromino;
+    const length = Math.sqrt(tetromino.indices.length);
+
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){
-            //if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+            if(preservedTetromino.indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+                const index = xyToIndex(addVec2({x, y}, preservedTetromino.coord), BOARD_WIDTH);                
+                const cell: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
+                cell.innerHTML = "";                
+            }
+        }
+    }
+    for(let y = 0; y <length; ++y){
+        for(let x = 0; x <length; ++x){
+            if(tetromino.indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
                 const index = xyToIndex(addVec2({x, y}, tetromino.coord), BOARD_WIDTH);                
                 const cell: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
-                cell.innerHTML =  board.indices[index] == 0 ? "" : board.indices[index].toString();                
-                if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO)
-                    cell.style.backgroundColor = '#000'
-                else
-                    cell.style.backgroundColor = '#fff'
-          //  }
+                cell.innerHTML =  CELL_TETROMINO.toString();                
+            }
         }
     }
 }

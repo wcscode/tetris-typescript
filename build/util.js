@@ -7,8 +7,25 @@ function isBusyCell(board, coord) {
     const freeCellsStates = [CELL_EMPTY, CELL_TETROMINO];
     return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
 }
+export function tryKick(board, tetromino, action) {
+    switch (action) {
+        case "right": {
+            break;
+        }
+        case "left": {
+            tetromino.coord = addVec2(tetromino.coord, { x: -1, y: 0 });
+            break;
+        }
+        case "down": {
+            tetromino.coord = addVec2(tetromino.coord, { x: 0, y: 1 });
+            break;
+        }
+        case "clockwise": { }
+    }
+    return undefined;
+}
 export function willCollide(board, tetromino, action) {
-    const { indices, coord } = setAction({ coord: { x: tetromino.coord.x, y: tetromino.coord.y }, indices: tetromino.indices, name: tetromino.name }, action);
+    const { indices, coord } = setAction(createDeepCopyFromTetromino(tetromino), action);
     const length = Math.sqrt(indices.length);
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
@@ -39,7 +56,7 @@ export function setInput() {
     });
     return pressedKeys;
 }
-export function preserveTetromino(tetromino) {
+export function createDeepCopyFromTetromino(tetromino) {
     return {
         name: tetromino.name,
         coord: { x: tetromino.coord.x, y: tetromino.coord.y },
@@ -141,20 +158,25 @@ export function formatToRenderConsole(board) {
     }
     return newBoards;
 }
-export function render(board, tetromino) {
-    const { indices } = tetromino;
-    const length = Math.sqrt(indices.length);
+export function render(board, preservedTetromino, tetromino) {
+    // const {indices} = tetromino;
+    const length = Math.sqrt(tetromino.indices.length);
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
-            //if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
-            const index = xyToIndex(addVec2({ x, y }, tetromino.coord), BOARD_WIDTH);
-            const cell = document.querySelector(`[data-cell-id="${index}"]`);
-            cell.innerHTML = board.indices[index] == 0 ? "" : board.indices[index].toString();
-            if (indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO)
-                cell.style.backgroundColor = '#000';
-            else
-                cell.style.backgroundColor = '#fff';
-            //  }
+            if (preservedTetromino.indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO) {
+                const index = xyToIndex(addVec2({ x, y }, preservedTetromino.coord), BOARD_WIDTH);
+                const cell = document.querySelector(`[data-cell-id="${index}"]`);
+                cell.innerHTML = "";
+            }
+        }
+    }
+    for (let y = 0; y < length; ++y) {
+        for (let x = 0; x < length; ++x) {
+            if (tetromino.indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO) {
+                const index = xyToIndex(addVec2({ x, y }, tetromino.coord), BOARD_WIDTH);
+                const cell = document.querySelector(`[data-cell-id="${index}"]`);
+                cell.innerHTML = CELL_TETROMINO.toString();
+            }
         }
     }
 }

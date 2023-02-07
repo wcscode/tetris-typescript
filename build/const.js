@@ -19,7 +19,7 @@ export const UPDATE_FRAME_IN_MILLISECONDS = 1000;
 }*/
 export const L_TETROMINO = {
     name: "L",
-    coord: { x: 8, y: 0 },
+    coord: { x: 5, y: 0 },
     indices: [
         0, CELL_TETROMINO, 0,
         0, CELL_TETROMINO, 0,
