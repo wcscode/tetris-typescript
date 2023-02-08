@@ -3,8 +3,7 @@ import {
   buildBoardArray, 
   clearTetrominosFromBoard, 
   action, 
-  key,
-  formatToRenderConsole, 
+  key, 
   getRandomTetromino, 
   mapOfKeyAndMovements,   
   setInput,
@@ -33,14 +32,9 @@ function update(){
                 tetromino = setAction(tetromino, action);      
                 
             } 
-    }); 
-    //console.log(willCollide(board, tetromino, "clockwise"))
-    //tetromino = setAction(tetromino, "clockwise");
-    //willCollide(board, tetromino, "right");
-     
+    });     
     board = clearTetrominosFromBoard(board, preservedTetromino);      
     board = putTetrominoInsideBoard(board, tetromino);
-    //console.table(formatToRenderConsole(board));
     render(board, preservedTetromino, tetromino);
   }
  

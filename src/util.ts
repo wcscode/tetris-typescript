@@ -13,6 +13,10 @@ import {
 export type action = "left" | "right" | "down" | "up" | "clockwise" | "counterClockwise";
 export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
 export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"; 
+export type rotationState = "spawn" | "right" | "left" | "twoRotation";
+const rotationsStates: rotationState[] = ["right", "spawn", "left", "twoRotation"];
+enum rotateTo { left = -1, right = + 1};
+
 interface vec2 {x: number, y:number};
 
 export interface IBoard{
@@ -21,6 +25,7 @@ export interface IBoard{
 
 export interface ITetromino {    
     name: tetrominoName;
+    rotationState: rotationState;
     coord: vec2;
     indices: number[];
 }
@@ -85,6 +90,7 @@ export function setInput(): Set<string> {
 export function createDeepCopyFromTetromino(tetromino: ITetromino): ITetromino{
     return {
         name: tetromino.name, 
+        rotationState: tetromino.rotationState,
         coord:{x:tetromino.coord.x, y:tetromino.coord.y},        
         indices: Array.from(tetromino.indices)}
 }
@@ -102,6 +108,11 @@ export function clearTetrominosFromBoard(board: IBoard, tetromino:ITetromino): I
     return board;
 }
 
+function setRotationState(rotationState: rotationState, rotationStateLength: number, rotateTo: rotateTo): number{
+    return ((rotationsStates.indexOf(rotationState) + rotateTo) % 
+            rotationStateLength + rotationStateLength) % rotationStateLength;
+}
+
 export function setAction(tetromino: ITetromino, action: action): ITetromino {
     switch(action){          
         case "right":{
@@ -117,20 +128,21 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             break; 
         }
         case "clockwise":{
-            const {indices} = tetromino;
+            const {indices, rotationState} = tetromino;
             const length = Math.sqrt(indices.length);     
             const currentIndices = Array.from(indices);
             let index = 0;    
             for(let x = 0; x < length; ++x){
                 for(let y = length - 1; y >= 0; --y){                   
-                    tetromino.indices[index] = currentIndices[xyToIndex({x, y}, length)]
+                    indices[index] = currentIndices[xyToIndex({x, y}, length)]
                     ++index;                  
                 }        
-            } 
+            }           
+            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.right)];
             break;
         }
         case "counterClockwise": {
-            const {indices} = tetromino;
+            const {indices, rotationState} = tetromino;
             const length = Math.sqrt(indices.length);     
             const currentIndices = Array.from(indices);
             let index = 0;    
@@ -140,6 +152,7 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
                     ++index;                  
                 }        
             } 
+            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.left)];
         }
     }   
     
@@ -155,8 +168,7 @@ export function putTetrominoInsideBoard(board:IBoard, tetromino: ITetromino): IB
                 board.indices[xyToIndex(addVec2({x, y}, coord), BOARD_WIDTH)] = CELL_TETROMINO;  
             }
         } 
-    }  
-    
+    }      
     return board;
 }
 
@@ -190,10 +202,8 @@ export function formatToRenderConsole(board: IBoard): number[][]{
     }
     return newBoards;
 }
-export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:ITetromino) {
-   // const {indices} = tetromino;
+export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:ITetromino): void{
     const length = Math.sqrt(tetromino.indices.length);
-
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){
             if(preservedTetromino.indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
@@ -226,7 +236,6 @@ export function buildDivBoard(board: IBoard, containerId: string): void{
            cell.setAttribute("data-cell-id", index);
            cell.style.display = "inline-block";
            cell.style.width = cell.style.height = "1.2rem";
-
            cell.innerHTML = board.indices[index] == 0 ? "" : board.indices[index];
            row.append(cell);           
         }

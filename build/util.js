@@ -2,6 +2,13 @@ import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, L_TET
 //TETROMINO_LENGTH,
 //  L_TETROMINO
  } from "./const.js";
+const rotationsStates = ["right", "spawn", "left", "twoRotation"];
+var rotateTo;
+(function (rotateTo) {
+    rotateTo[rotateTo["left"] = -1] = "left";
+    rotateTo[rotateTo["right"] = 1] = "right";
+})(rotateTo || (rotateTo = {}));
+;
 ;
 function isBusyCell(board, coord) {
     const freeCellsStates = [CELL_EMPTY, CELL_TETROMINO];
@@ -59,6 +66,7 @@ export function setInput() {
 export function createDeepCopyFromTetromino(tetromino) {
     return {
         name: tetromino.name,
+        rotationState: tetromino.rotationState,
         coord: { x: tetromino.coord.x, y: tetromino.coord.y },
         indices: Array.from(tetromino.indices)
     };
@@ -75,6 +83,10 @@ export function clearTetrominosFromBoard(board, tetromino) {
     }
     return board;
 }
+function setRotationState(rotationState, rotationStateLength, rotateTo) {
+    return ((rotationsStates.indexOf(rotationState) + rotateTo) %
+        rotationStateLength + rotationStateLength) % rotationStateLength;
+}
 export function setAction(tetromino, action) {
     switch (action) {
         case "right": {
@@ -90,20 +102,21 @@ export function setAction(tetromino, action) {
             break;
         }
         case "clockwise": {
-            const { indices } = tetromino;
+            const { indices, rotationState } = tetromino;
             const length = Math.sqrt(indices.length);
             const currentIndices = Array.from(indices);
             let index = 0;
             for (let x = 0; x < length; ++x) {
                 for (let y = length - 1; y >= 0; --y) {
-                    tetromino.indices[index] = currentIndices[xyToIndex({ x, y }, length)];
+                    indices[index] = currentIndices[xyToIndex({ x, y }, length)];
                     ++index;
                 }
             }
+            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.right)];
             break;
         }
         case "counterClockwise": {
-            const { indices } = tetromino;
+            const { indices, rotationState } = tetromino;
             const length = Math.sqrt(indices.length);
             const currentIndices = Array.from(indices);
             let index = 0;
@@ -113,6 +126,7 @@ export function setAction(tetromino, action) {
                     ++index;
                 }
             }
+            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.left)];
         }
     }
     return tetromino;
@@ -159,7 +173,6 @@ export function formatToRenderConsole(board) {
     return newBoards;
 }
 export function render(board, preservedTetromino, tetromino) {
-    // const {indices} = tetromino;
     const length = Math.sqrt(tetromino.indices.length);
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
