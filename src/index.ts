@@ -1,15 +1,17 @@
-import {UPDATE_FRAME_IN_MILLISECONDS} from "./const.js";
+import {
+  UPDATE_FRAME_IN_MILLISECONDS,
+  action,
+  IBoard,
+  ITetromino,
+  key, 
+} from "./const.js";
 import { 
   buildBoardArray, 
   clearTetrominosFromBoard, 
-  action, 
-  key, 
   getRandomTetromino, 
   mapOfKeyAndMovements,   
   setInput,
-  ITetromino,
   setAction,
-  IBoard,
   putTetrominoInsideBoard,
   createDeepCopyFromTetromino,
   willCollide,

@@ -6,29 +6,20 @@ import {
     CELL_WALL, 
     CELL_FROZEN, 
     L_TETROMINO,
+    IBoard,
+    vec2,
+    action,
+    key,
+    rotationState,
+    rotateTo,
+    ITetromino,
+    ROTATIONS_STATES_LENGTH,
+    ROTATIONS_STATES,
     //TETROMINO_LENGTH,
   //  L_TETROMINO
 } from "./const.js";
 
-export type action = "left" | "right" | "down" | "up" | "clockwise" | "counterClockwise";
-export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
-export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"; 
-export type rotationState = "spawn" | "right" | "left" | "twoRotation";
-const rotationsStates: rotationState[] = ["right", "spawn", "left", "twoRotation"];
-enum rotateTo { left = -1, right = + 1};
 
-interface vec2 {x: number, y:number};
-
-export interface IBoard{
-    indices: number[];
-}
-
-export interface ITetromino {    
-    name: tetrominoName;
-    rotationState: rotationState;
-    coord: vec2;
-    indices: number[];
-}
 
 function isBusyCell(board: IBoard, coord:vec2): boolean{
     const freeCellsStates: number[] = [CELL_EMPTY, CELL_TETROMINO];
@@ -108,9 +99,9 @@ export function clearTetrominosFromBoard(board: IBoard, tetromino:ITetromino): I
     return board;
 }
 
-function setRotationState(rotationState: rotationState, rotationStateLength: number, rotateTo: rotateTo): number{
-    return ((rotationsStates.indexOf(rotationState) + rotateTo) % 
-            rotationStateLength + rotationStateLength) % rotationStateLength;
+function newRotationState(rotationState: rotationState, rotateTo: rotateTo): rotationState{
+    return ROTATIONS_STATES[((ROTATIONS_STATES.indexOf(rotationState) + rotateTo) % 
+    ROTATIONS_STATES_LENGTH + ROTATIONS_STATES_LENGTH) % ROTATIONS_STATES_LENGTH];
 }
 
 export function setAction(tetromino: ITetromino, action: action): ITetromino {
@@ -138,7 +129,7 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
                     ++index;                  
                 }        
             }           
-            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.right)];
+            tetromino.rotationState = newRotationState(rotationState, rotateTo.right);
             break;
         }
         case "counterClockwise": {
@@ -147,12 +138,12 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             const currentIndices = Array.from(indices);
             let index = 0;    
             for(let x = length - 1; x >= 0; --x){  
-            for(let y = 0; y < length; ++y){                                 
+                for(let y = 0; y < length; ++y){                                 
                     tetromino.indices[index] = currentIndices[xyToIndex({x, y}, length)]
                     ++index;                  
                 }        
             } 
-            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.left)];
+            tetromino.rotationState = newRotationState(rotationState, rotateTo.left);
         }
     }   
     
