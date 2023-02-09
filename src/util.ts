@@ -15,33 +15,27 @@ import {
     ITetromino,
     ROTATIONS_STATES_LENGTH,
     ROTATIONS_STATES,
-    //TETROMINO_LENGTH,
-  //  L_TETROMINO
+    I_TETROMINO_WALL_KICK_DATA,
+    JLTSZ_TETROMINO_WALL_KICK_DATA,
 } from "./const.js";
-
-
 
 function isBusyCell(board: IBoard, coord:vec2): boolean{
     const freeCellsStates: number[] = [CELL_EMPTY, CELL_TETROMINO];
     return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
 }
 
-export function tryKick(board: IBoard, tetromino: ITetromino, action: action): action {
-    switch(action){          
-        case "right":{
-            
-            break; 
-        }  
-        case "left":{
-            tetromino.coord = addVec2(tetromino.coord, {x:-1, y:0})
-            break; 
-        }    
-        case "down":{
-            tetromino.coord = addVec2(tetromino.coord, {x:0, y:1})
-            break; 
-        }
-        case "clockwise":{}}
-    return undefined;
+export function tryKick(board: IBoard, tetromino: ITetromino, action: action): ITetromino {
+    if(action != "clockwise" && action != "counterClockwise")   
+        return tetromino;
+    const wallKickData = tetromino.name == "I" ? 
+        I_TETROMINO_WALL_KICK_DATA : 
+        JLTSZ_TETROMINO_WALL_KICK_DATA;
+        const tests = wallKickData.filter(
+            f => f.from == tetromino.rotationState && f.to == "spawn");           
+        tests.forEach(test => {       
+            if(!willCollide(board, tetromino, action))
+                return setAction(tetromino, action);
+        });        
 }
 
 export function willCollide(board: IBoard, tetromino: ITetromino, action: action): boolean{  
@@ -182,17 +176,6 @@ export function buildBoardArray(): IBoard {
     return {indices: indices};    
 }
 
-export function formatToRenderConsole(board: IBoard): number[][]{
-    const newBoards: number[][] = [];
-    for(let y: number = 0; y < BOARD_HEIGHT; ++y){
-        const xBoards: number[] = [];
-        for(let x: number = 0; x < BOARD_WIDTH; ++x){
-           xBoards.push(board.indices[xyToIndex({x, y}, BOARD_WIDTH)]);           
-        }
-        newBoards[y] = xBoards;
-    }
-    return newBoards;
-}
 export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:ITetromino): void{
     const length = Math.sqrt(tetromino.indices.length);
     for(let y = 0; y <length; ++y){

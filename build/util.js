@@ -1,35 +1,19 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, L_TETROMINO,
-//TETROMINO_LENGTH,
-//  L_TETROMINO
- } from "./const.js";
-const rotationsStates = ["right", "spawn", "left", "twoRotation"];
-var rotateTo;
-(function (rotateTo) {
-    rotateTo[rotateTo["left"] = -1] = "left";
-    rotateTo[rotateTo["right"] = 1] = "right";
-})(rotateTo || (rotateTo = {}));
-;
-;
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, } from "./const.js";
 function isBusyCell(board, coord) {
     const freeCellsStates = [CELL_EMPTY, CELL_TETROMINO];
     return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
 }
 export function tryKick(board, tetromino, action) {
-    switch (action) {
-        case "right": {
-            break;
-        }
-        case "left": {
-            tetromino.coord = addVec2(tetromino.coord, { x: -1, y: 0 });
-            break;
-        }
-        case "down": {
-            tetromino.coord = addVec2(tetromino.coord, { x: 0, y: 1 });
-            break;
-        }
-        case "clockwise": { }
-    }
-    return undefined;
+    if (action != "clockwise" && action != "counterClockwise")
+        return tetromino;
+    const wallKickData = tetromino.name == "I" ?
+        I_TETROMINO_WALL_KICK_DATA :
+        JLTSZ_TETROMINO_WALL_KICK_DATA;
+    const tests = wallKickData.filter(f => f.from == tetromino.rotationState && f.to == "spawn");
+    tests.forEach(test => {
+        if (!willCollide(board, tetromino, action))
+            return setAction(tetromino, action);
+    });
 }
 export function willCollide(board, tetromino, action) {
     const { indices, coord } = setAction(createDeepCopyFromTetromino(tetromino), action);
@@ -83,9 +67,9 @@ export function clearTetrominosFromBoard(board, tetromino) {
     }
     return board;
 }
-function setRotationState(rotationState, rotationStateLength, rotateTo) {
-    return ((rotationsStates.indexOf(rotationState) + rotateTo) %
-        rotationStateLength + rotationStateLength) % rotationStateLength;
+function newRotationState(rotationState, rotateTo) {
+    return ROTATIONS_STATES[((ROTATIONS_STATES.indexOf(rotationState) + rotateTo) %
+        ROTATIONS_STATES_LENGTH + ROTATIONS_STATES_LENGTH) % ROTATIONS_STATES_LENGTH];
 }
 export function setAction(tetromino, action) {
     switch (action) {
@@ -112,7 +96,7 @@ export function setAction(tetromino, action) {
                     ++index;
                 }
             }
-            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.right)];
+            tetromino.rotationState = newRotationState(rotationState, rotateTo.right);
             break;
         }
         case "counterClockwise": {
@@ -126,7 +110,7 @@ export function setAction(tetromino, action) {
                     ++index;
                 }
             }
-            tetromino.rotationState = rotationsStates[setRotationState(rotationState, rotationsStates.length, rotateTo.left)];
+            tetromino.rotationState = newRotationState(rotationState, rotateTo.left);
         }
     }
     return tetromino;
@@ -160,17 +144,6 @@ export function buildBoardArray() {
         }
     }
     return { indices: indices };
-}
-export function formatToRenderConsole(board) {
-    const newBoards = [];
-    for (let y = 0; y < BOARD_HEIGHT; ++y) {
-        const xBoards = [];
-        for (let x = 0; x < BOARD_WIDTH; ++x) {
-            xBoards.push(board.indices[xyToIndex({ x, y }, BOARD_WIDTH)]);
-        }
-        newBoards[y] = xBoards;
-    }
-    return newBoards;
 }
 export function render(board, preservedTetromino, tetromino) {
     const length = Math.sqrt(tetromino.indices.length);
