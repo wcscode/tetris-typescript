@@ -17,6 +17,7 @@ import {
     ROTATIONS_STATES,
     I_TETROMINO_WALL_KICK_DATA,
     JLTSZ_TETROMINO_WALL_KICK_DATA,
+   
 } from "./const.js";
 
 function isBusyCell(board: IBoard, coord:vec2): boolean{
@@ -26,20 +27,27 @@ function isBusyCell(board: IBoard, coord:vec2): boolean{
 
 export function tryKick(board: IBoard, tetromino: ITetromino, action: action): ITetromino {
     if(action != "clockwise" && action != "counterClockwise")   
-        return tetromino;
-    const wallKickData = tetromino.name == "I" ? 
+        return tetromino;       
+    const wallsKicksDatas = tetromino.name == "I" ? 
         I_TETROMINO_WALL_KICK_DATA : 
-        JLTSZ_TETROMINO_WALL_KICK_DATA;
-        const tests = wallKickData.filter(
-            f => f.from == tetromino.rotationState && f.to == "spawn");           
-        tests.forEach(test => {       
-            if(!willCollide(board, tetromino, action))
-                return setAction(tetromino, action);
-        });        
+        JLTSZ_TETROMINO_WALL_KICK_DATA;        
+        const wallKickData = wallsKicksDatas.find(
+            f => f.from == tetromino.rotationState && 
+            f.to == newRotationState(tetromino.rotationState, action == "clockwise" ? 
+            rotateTo.right : rotateTo.left));           
+        wallKickData.tests.forEach(testCoord => {    
+            const tempTetromino =  createDeepCopyFromTetromino(tetromino);
+            tempTetromino.coord = addVec2(tempTetromino.coord, testCoord);            
+            if(!willCollide(board, tempTetromino, action)){ 
+                console.log("temp" , tempTetromino.coord)               
+                return setAction(tempTetromino, action);
+            }
+        });  
+        return tetromino;      
 }
 
-export function willCollide(board: IBoard, tetromino: ITetromino, action: action): boolean{  
-    const {indices, coord} = setAction(createDeepCopyFromTetromino(tetromino), action);
+export function willCollide(board: IBoard, tempTetromino: ITetromino, action: action): boolean{  
+    const {indices, coord} = setAction(tempTetromino, action);
     const length = Math.sqrt(indices.length); 
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){          
@@ -99,6 +107,7 @@ function newRotationState(rotationState: rotationState, rotateTo: rotateTo): rot
 }
 
 export function setAction(tetromino: ITetromino, action: action): ITetromino {
+      
     switch(action){          
         case "right":{
             tetromino.coord = addVec2(tetromino.coord, {x:1, y:0})
@@ -113,6 +122,7 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             break; 
         }
         case "clockwise":{
+            console.log("clock", tetromino.coord)
             const {indices, rotationState} = tetromino;
             const length = Math.sqrt(indices.length);     
             const currentIndices = Array.from(indices);
@@ -127,6 +137,7 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             break;
         }
         case "counterClockwise": {
+            console.log("counter", tetromino.coord)
             const {indices, rotationState} = tetromino;
             const length = Math.sqrt(indices.length);     
             const currentIndices = Array.from(indices);
@@ -139,8 +150,7 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             } 
             tetromino.rotationState = newRotationState(rotationState, rotateTo.left);
         }
-    }   
-    
+    }  
     return tetromino;
 }
 
@@ -196,6 +206,7 @@ export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:
             }
         }
     }
+    document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`
 }
 
 export function buildDivBoard(board: IBoard, containerId: string): void{

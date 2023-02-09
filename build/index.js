@@ -10,7 +10,8 @@ function update() {
     const preservedTetromino = createDeepCopyFromTetromino(tetromino);
     inputsMaps.forEach((action, key) => {
         if (pressedKeys.has(key)) {
-            if (!willCollide(board, tetromino, action))
+            const tempTetromino = createDeepCopyFromTetromino(tetromino);
+            if (!willCollide(board, tempTetromino, action))
                 tetromino = setAction(tetromino, action);
             else
                 tetromino = tryKick(board, tetromino, action);

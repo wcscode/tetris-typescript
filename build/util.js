@@ -6,17 +6,24 @@ function isBusyCell(board, coord) {
 export function tryKick(board, tetromino, action) {
     if (action != "clockwise" && action != "counterClockwise")
         return tetromino;
-    const wallKickData = tetromino.name == "I" ?
+    const wallsKicksDatas = tetromino.name == "I" ?
         I_TETROMINO_WALL_KICK_DATA :
         JLTSZ_TETROMINO_WALL_KICK_DATA;
-    const tests = wallKickData.filter(f => f.from == tetromino.rotationState && f.to == "spawn");
-    tests.forEach(test => {
-        if (!willCollide(board, tetromino, action))
-            return setAction(tetromino, action);
+    const wallKickData = wallsKicksDatas.find(f => f.from == tetromino.rotationState &&
+        f.to == newRotationState(tetromino.rotationState, action == "clockwise" ?
+            rotateTo.right : rotateTo.left));
+    wallKickData.tests.forEach(testCoord => {
+        const tempTetromino = createDeepCopyFromTetromino(tetromino);
+        tempTetromino.coord = addVec2(tempTetromino.coord, testCoord);
+        if (!willCollide(board, tempTetromino, action)) {
+            console.log("temp", tempTetromino.coord);
+            return setAction(tempTetromino, action);
+        }
     });
+    return tetromino;
 }
-export function willCollide(board, tetromino, action) {
-    const { indices, coord } = setAction(createDeepCopyFromTetromino(tetromino), action);
+export function willCollide(board, tempTetromino, action) {
+    const { indices, coord } = setAction(tempTetromino, action);
     const length = Math.sqrt(indices.length);
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
@@ -86,6 +93,7 @@ export function setAction(tetromino, action) {
             break;
         }
         case "clockwise": {
+            console.log("clock", tetromino.coord);
             const { indices, rotationState } = tetromino;
             const length = Math.sqrt(indices.length);
             const currentIndices = Array.from(indices);
@@ -100,6 +108,7 @@ export function setAction(tetromino, action) {
             break;
         }
         case "counterClockwise": {
+            console.log("counter", tetromino.coord);
             const { indices, rotationState } = tetromino;
             const length = Math.sqrt(indices.length);
             const currentIndices = Array.from(indices);
@@ -165,6 +174,7 @@ export function render(board, preservedTetromino, tetromino) {
             }
         }
     }
+    document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
 }
 export function buildDivBoard(board, containerId) {
     const container = document.getElementById(containerId);

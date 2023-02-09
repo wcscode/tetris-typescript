@@ -47,7 +47,7 @@ export const I_TETROMINO_WALL_KICK_DATA = [
 }*/
 export const L_TETROMINO = {
     name: "L",
-    coord: { x: 5, y: 0 },
+    coord: { x: 0, y: 0 },
     rotationState: "spawn",
     indices: [
         0, CELL_TETROMINO, 0,
