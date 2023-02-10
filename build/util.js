@@ -12,11 +12,12 @@ export function tryKick(board, tetromino, action) {
     const wallKickData = wallsKicksDatas.find(f => f.from == tetromino.rotationState &&
         f.to == newRotationState(tetromino.rotationState, action == "clockwise" ?
             rotateTo.right : rotateTo.left));
+    console.log(action, tetromino.rotationState, wallKickData);
     wallKickData.tests.forEach(testCoord => {
         const tempTetromino = createDeepCopyFromTetromino(tetromino);
         tempTetromino.coord = addVec2(tempTetromino.coord, testCoord);
         if (!willCollide(board, tempTetromino, action)) {
-            console.log("temp", tempTetromino.coord);
+            //  console.log("temp" , tempTetromino.coord)               
             return setAction(tempTetromino, action);
         }
     });
@@ -175,6 +176,7 @@ export function render(board, preservedTetromino, tetromino) {
         }
     }
     document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
+    document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
 }
 export function buildDivBoard(board, containerId) {
     const container = document.getElementById(containerId);

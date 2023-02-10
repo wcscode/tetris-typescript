@@ -29,7 +29,7 @@ export const CELL_WALL: number = 1;
 export const CELL_FROZEN: number = 2;
 export const CELL_TETROMINO: number = 3;
 export const UPDATE_FRAME_IN_MILLISECONDS = 1000;
-export const ROTATIONS_STATES: rotationState[] = ["right", "spawn", "left", "twoRotation"];
+export const ROTATIONS_STATES: rotationState[] = ["left", "spawn", "right", "twoRotation"];
 export const ROTATIONS_STATES_LENGTH: number = ROTATIONS_STATES.length;
 export const JLTSZ_TETROMINO_WALL_KICK_DATA: IRotationState[] =  [
     {from: "spawn", to: "right", tests: [{x:-1, y:0}, {x:-1, y:1}, {x:0, y:-2}, {x:-1, y:-2}]}, 
