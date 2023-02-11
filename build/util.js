@@ -12,18 +12,23 @@ export function tryKick(board, tetromino, action) {
     const wallKickData = wallsKicksDatas.find(f => f.from == tetromino.rotationState &&
         f.to == newRotationState(tetromino.rotationState, action == "clockwise" ?
             rotateTo.right : rotateTo.left));
-    console.log(action, tetromino.rotationState, wallKickData);
-    wallKickData.tests.forEach(testCoord => {
+    // console.log('trykick',tetromino.rotationState, wallKickData) 
+    let count = 0;
+    for (let i = 0; i < wallKickData.tests.length; ++i) {
         const tempTetromino = createDeepCopyFromTetromino(tetromino);
-        tempTetromino.coord = addVec2(tempTetromino.coord, testCoord);
+        tempTetromino.coord = addVec2(tempTetromino.coord, wallKickData.tests[i]);
         if (!willCollide(board, tempTetromino, action)) {
-            //  console.log("temp" , tempTetromino.coord)               
-            return setAction(tempTetromino, action);
+            tetromino = tempTetromino;
+            console.log(count);
+            count++;
+            break;
         }
-    });
+    }
+    ;
     return tetromino;
 }
 export function willCollide(board, tempTetromino, action) {
+    // console.log('willCollide')  
     const { indices, coord } = setAction(tempTetromino, action);
     const length = Math.sqrt(indices.length);
     for (let y = 0; y < length; ++y) {
@@ -35,6 +40,51 @@ export function willCollide(board, tempTetromino, action) {
         }
     }
     return false;
+}
+export function setAction(tetromino, action) {
+    switch (action) {
+        case "right": {
+            tetromino.coord = addVec2(tetromino.coord, { x: 1, y: 0 });
+            break;
+        }
+        case "left": {
+            tetromino.coord = addVec2(tetromino.coord, { x: -1, y: 0 });
+            break;
+        }
+        case "down": {
+            tetromino.coord = addVec2(tetromino.coord, { x: 0, y: 1 });
+            break;
+        }
+        case "clockwise": {
+            // console.log("setaction", tetromino.coord)
+            const { indices, rotationState } = tetromino;
+            const length = Math.sqrt(indices.length);
+            const currentIndices = Array.from(indices);
+            let index = 0;
+            for (let x = 0; x < length; ++x) {
+                for (let y = length - 1; y >= 0; --y) {
+                    indices[index] = currentIndices[xyToIndex({ x, y }, length)];
+                    ++index;
+                }
+            }
+            tetromino.rotationState = newRotationState(rotationState, rotateTo.right);
+            break;
+        }
+        case "counterClockwise": {
+            const { indices, rotationState } = tetromino;
+            const length = Math.sqrt(indices.length);
+            const currentIndices = Array.from(indices);
+            let index = 0;
+            for (let x = length - 1; x >= 0; --x) {
+                for (let y = 0; y < length; ++y) {
+                    tetromino.indices[index] = currentIndices[xyToIndex({ x, y }, length)];
+                    ++index;
+                }
+            }
+            tetromino.rotationState = newRotationState(rotationState, rotateTo.left);
+        }
+    }
+    return tetromino;
 }
 export function mapOfKeyAndMovements() {
     const mapOfMovements = new Map();
@@ -78,52 +128,6 @@ export function clearTetrominosFromBoard(board, tetromino) {
 function newRotationState(rotationState, rotateTo) {
     return ROTATIONS_STATES[((ROTATIONS_STATES.indexOf(rotationState) + rotateTo) %
         ROTATIONS_STATES_LENGTH + ROTATIONS_STATES_LENGTH) % ROTATIONS_STATES_LENGTH];
-}
-export function setAction(tetromino, action) {
-    switch (action) {
-        case "right": {
-            tetromino.coord = addVec2(tetromino.coord, { x: 1, y: 0 });
-            break;
-        }
-        case "left": {
-            tetromino.coord = addVec2(tetromino.coord, { x: -1, y: 0 });
-            break;
-        }
-        case "down": {
-            tetromino.coord = addVec2(tetromino.coord, { x: 0, y: 1 });
-            break;
-        }
-        case "clockwise": {
-            console.log("clock", tetromino.coord);
-            const { indices, rotationState } = tetromino;
-            const length = Math.sqrt(indices.length);
-            const currentIndices = Array.from(indices);
-            let index = 0;
-            for (let x = 0; x < length; ++x) {
-                for (let y = length - 1; y >= 0; --y) {
-                    indices[index] = currentIndices[xyToIndex({ x, y }, length)];
-                    ++index;
-                }
-            }
-            tetromino.rotationState = newRotationState(rotationState, rotateTo.right);
-            break;
-        }
-        case "counterClockwise": {
-            console.log("counter", tetromino.coord);
-            const { indices, rotationState } = tetromino;
-            const length = Math.sqrt(indices.length);
-            const currentIndices = Array.from(indices);
-            let index = 0;
-            for (let x = length - 1; x >= 0; --x) {
-                for (let y = 0; y < length; ++y) {
-                    tetromino.indices[index] = currentIndices[xyToIndex({ x, y }, length)];
-                    ++index;
-                }
-            }
-            tetromino.rotationState = newRotationState(rotationState, rotateTo.left);
-        }
-    }
-    return tetromino;
 }
 export function putTetrominoInsideBoard(board, tetromino) {
     const { coord, indices } = tetromino;

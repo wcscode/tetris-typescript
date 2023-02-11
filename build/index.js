@@ -11,10 +11,14 @@ function update() {
     inputsMaps.forEach((action, key) => {
         if (pressedKeys.has(key)) {
             const tempTetromino = createDeepCopyFromTetromino(tetromino);
-            if (!willCollide(board, tempTetromino, action))
+            if (!willCollide(board, tempTetromino, action)) {
                 tetromino = setAction(tetromino, action);
-            else
+            }
+            else {
+                // console.log('ac',tetromino)
                 tetromino = tryKick(board, tetromino, action);
+                // console.log('dc',tetromino)
+            }
         }
     });
     board = clearTetrominosFromBoard(board, preservedTetromino);
