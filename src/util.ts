@@ -17,6 +17,7 @@ import {
     ROTATIONS_STATES,
     I_TETROMINO_WALL_KICK_DATA,
     JLTSZ_TETROMINO_WALL_KICK_DATA,
+    IInputManager,
    
 } from "./const.js";
 
@@ -123,16 +124,25 @@ export function mapOfKeyAndMovements(){
     return mapOfMovements;
 }
 
-export function setInput(): Set<string> {
+export function setInput(): IInputManager {
     const pressedKeys = new Set<string>();
+    const removedKeys = new Set<string>();
+
     document.addEventListener("keydown", function(event) {    
-        pressedKeys.add(event.key);       
+        if(!removedKeys.has(event.key))             
+            pressedKeys.add(event.key);       
     });
     document.addEventListener("keyup", function(event) {
         pressedKeys.delete(event.key);        
     });
-    return pressedKeys;
+    return {pressedKeys, removedKeys};
 }
+export function forceUserClickButton(pressedKeys: Set<string>, removedKeys: Set<string>, key: key): void{
+    if(pressedKeys.has(key))
+        pressedKeys.delete(key);  
+    removedKeys.add(key);
+}
+
 export function createDeepCopyFromTetromino(tetromino: ITetromino): ITetromino{
     return {
         name: tetromino.name, 

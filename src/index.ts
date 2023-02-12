@@ -17,10 +17,11 @@ import {
   willCollide,
   buildDivBoard,
   render,
-  tryKick
+  tryKick,
+  forceUserClickButton
 } from "./util.js";
 
-const pressedKeys = setInput();
+const {pressedKeys, removedKeys} = setInput();
 const inputsMaps = mapOfKeyAndMovements();
 let board: IBoard = buildBoardArray();
 buildDivBoard(board, "board");
@@ -30,19 +31,18 @@ function update(){
     const preservedTetromino = createDeepCopyFromTetromino(tetromino);
     inputsMaps.forEach((action: action, key: key) => {        
         if (pressedKeys.has(key)) {
-            const tempTetromino =  createDeepCopyFromTetromino(tetromino);
-            if(!willCollide(board, tempTetromino, action)) {          
-              tetromino = setAction(tetromino, action);
-            }else{
-             // console.log('ac',tetromino)
-              tetromino = tryKick(board, tetromino, action);
-             // console.log('dc',tetromino)
-            }
+            const tempTetromino =  createDeepCopyFromTetromino(tetromino);                      
+            tetromino = !willCollide(board, tempTetromino, action) ?
+              setAction(tetromino, action) :
+              tryKick(board, tetromino, action);  
+            forceUserClickButton(pressedKeys, removedKeys, "a");  
         }            
-    });        
+    }); 
+         
     board = clearTetrominosFromBoard(board, preservedTetromino);      
     board = putTetrominoInsideBoard(board, tetromino);
     render(board, preservedTetromino, tetromino);
+    
   }
  
 update();

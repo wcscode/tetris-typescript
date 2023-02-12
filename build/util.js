@@ -97,13 +97,20 @@ export function mapOfKeyAndMovements() {
 }
 export function setInput() {
     const pressedKeys = new Set();
+    const removedKeys = new Set();
     document.addEventListener("keydown", function (event) {
-        pressedKeys.add(event.key);
+        if (!removedKeys.has(event.key))
+            pressedKeys.add(event.key);
     });
     document.addEventListener("keyup", function (event) {
         pressedKeys.delete(event.key);
     });
-    return pressedKeys;
+    return { pressedKeys, removedKeys };
+}
+export function forceUserClickButton(pressedKeys, removedKeys, key) {
+    if (pressedKeys.has(key))
+        pressedKeys.delete(key);
+    removedKeys.add(key);
 }
 export function createDeepCopyFromTetromino(tetromino) {
     return {

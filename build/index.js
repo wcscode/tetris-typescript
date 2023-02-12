@@ -1,6 +1,6 @@
 import { UPDATE_FRAME_IN_MILLISECONDS, } from "./const.js";
-import { buildBoardArray, clearTetrominosFromBoard, getRandomTetromino, mapOfKeyAndMovements, setInput, setAction, putTetrominoInsideBoard, createDeepCopyFromTetromino, willCollide, buildDivBoard, render, tryKick } from "./util.js";
-const pressedKeys = setInput();
+import { buildBoardArray, clearTetrominosFromBoard, getRandomTetromino, mapOfKeyAndMovements, setInput, setAction, putTetrominoInsideBoard, createDeepCopyFromTetromino, willCollide, buildDivBoard, render, tryKick, forceUserClickButton } from "./util.js";
+const { pressedKeys, removedKeys } = setInput();
 const inputsMaps = mapOfKeyAndMovements();
 let board = buildBoardArray();
 buildDivBoard(board, "board");
@@ -11,14 +11,10 @@ function update() {
     inputsMaps.forEach((action, key) => {
         if (pressedKeys.has(key)) {
             const tempTetromino = createDeepCopyFromTetromino(tetromino);
-            if (!willCollide(board, tempTetromino, action)) {
-                tetromino = setAction(tetromino, action);
-            }
-            else {
-                // console.log('ac',tetromino)
-                tetromino = tryKick(board, tetromino, action);
-                // console.log('dc',tetromino)
-            }
+            tetromino = !willCollide(board, tempTetromino, action) ?
+                setAction(tetromino, action) :
+                tryKick(board, tetromino, action);
+            forceUserClickButton(pressedKeys, removedKeys, "a");
         }
     });
     board = clearTetrominosFromBoard(board, preservedTetromino);

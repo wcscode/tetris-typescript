@@ -9,6 +9,10 @@ export interface vec2 {x: number, y:number};
 export interface IBoard{
     indices: number[];
 }
+export interface IInputManager{
+    pressedKeys: Set<string>;
+    removedKeys: Set<string>;
+}
 
 export interface ITetromino {    
     name: tetrominoName;
@@ -28,11 +32,11 @@ export const CELL_EMPTY: number = 0;
 export const CELL_WALL: number = 1;
 export const CELL_FROZEN: number = 2;
 export const CELL_TETROMINO: number = 3;
-export const UPDATE_FRAME_IN_MILLISECONDS = 1000;
+export const UPDATE_FRAME_IN_MILLISECONDS = 100;
 export const ROTATIONS_STATES: rotationState[] = ["left", "spawn", "right", "twoRotation"];
 export const ROTATIONS_STATES_LENGTH: number = ROTATIONS_STATES.length;
 export const JLTSZ_TETROMINO_WALL_KICK_DATA: IRotationState[] =  [
-    {from: "spawn", to: "right", tests: [{x:-1, y:0}, {x:-1, y:1}, {x:0, y:-2}, {x:-1, y:-2}]}, 
+    {from: "spawn", to: "right", tests: [{x:1, y:0}, {x:-1, y:0}, {x:-1, y:1}, {x:0, y:-2}, {x:-1, y:-2}]}, 
     {from: "right", to: "spawn", tests: [{x:1, y:0}, {x:1, y:-1}, {x:0, y:2}, {x:1, y:2}]},
     {from: "right", to: "twoRotation", tests: [{x:1, y:0}, {x:1, y:-1}, {x:0, y:2}, {x:1, y:2}]},
     {from: "twoRotation", to: "right", tests: [{x:-1, y:0}, {x:-1, y:1}, {x:0, y:-2}, {x:-1, y:-2}]},
