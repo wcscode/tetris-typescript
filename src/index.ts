@@ -36,6 +36,7 @@ function update(){
               setAction(tetromino, action) :
               tryKick(board, tetromino, action);  
             forceUserClickButton(pressedKeys, removedKeys, "a");  
+            forceUserClickButton(pressedKeys, removedKeys, "s"); 
         }            
     }); 
          

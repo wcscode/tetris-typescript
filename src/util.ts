@@ -133,7 +133,8 @@ export function setInput(): IInputManager {
             pressedKeys.add(event.key);       
     });
     document.addEventListener("keyup", function(event) {
-        pressedKeys.delete(event.key);        
+        pressedKeys.delete(event.key); 
+        removedKeys.delete(event.key);       
     });
     return {pressedKeys, removedKeys};
 }

@@ -104,6 +104,7 @@ export function setInput() {
     });
     document.addEventListener("keyup", function (event) {
         pressedKeys.delete(event.key);
+        removedKeys.delete(event.key);
     });
     return { pressedKeys, removedKeys };
 }
