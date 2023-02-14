@@ -3,7 +3,8 @@ import {
   action,
   IBoard,
   ITetromino,
-  key, 
+  key,
+  ITickManager, 
 } from "./const.js";
 import { 
   buildBoardArray, 
@@ -17,7 +18,9 @@ import {
   buildDivBoard,
   render,
   tryKick,
-  forceUserClickButton
+  forceUserClickButton,
+  isTickFall,
+  freezeTetromino
 } from "./util.js";
 
 const {pressedKeys, inputs} = setInput();
@@ -25,6 +28,7 @@ let board: IBoard = buildBoardArray();
 buildDivBoard(board, "board");
 let tetromino: ITetromino = getRandomTetromino();
 board = putTetrominoInsideBoard(board, tetromino);
+const tick:ITickManager = {count:0, rate:10};  
 function update(){
     const preservedTetromino = createDeepCopyFromTetromino(tetromino);
     inputs.forEach((action: action, key: key) => {        
@@ -35,10 +39,20 @@ function update(){
               tryKick(board, tetromino, action);  
         }            
     }); 
-    forceUserClickButton(pressedKeys, "a");  
-    forceUserClickButton(pressedKeys, "s");  
+    forceUserClickButton(pressedKeys, "a", "s");      
     board = clearTetrominosFromBoard(board, preservedTetromino);      
     board = putTetrominoInsideBoard(board, tetromino);
+    if(isTickFall(tick)){      
+      const tempTetromino =  createDeepCopyFromTetromino(tetromino);                      
+      if(willCollide(board, tempTetromino, "down")){       
+        const freezedTetromino = freezeTetromino(tetromino);
+        console.log(freezedTetromino);
+        render(board, preservedTetromino, freezedTetromino);
+        tetromino = getRandomTetromino();
+      }else{
+       tetromino = setAction(tetromino, "down");
+      }      
+    }
     render(board, preservedTetromino, tetromino);
     
   }

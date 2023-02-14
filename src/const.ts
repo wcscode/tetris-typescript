@@ -13,6 +13,10 @@ export interface IInputManager{
     pressedKeys: Set<string>;
     inputs: Map<key,action>;
 }
+export interface ITickManager{
+    count: number;
+    rate: number;
+}
 
 export interface ITetromino {    
     name: tetrominoName;

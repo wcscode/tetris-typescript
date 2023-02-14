@@ -18,12 +18,22 @@ import {
     I_TETROMINO_WALL_KICK_DATA,
     JLTSZ_TETROMINO_WALL_KICK_DATA,
     IInputManager, 
+    ITickManager,
    
 } from "./const.js";
 
-function isBusyCell(board: IBoard, coord:vec2): boolean{
-    const freeCellsStates: number[] = [CELL_EMPTY, CELL_TETROMINO];
-    return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
+export function freezeTetromino(tetromino: ITetromino): ITetromino {
+    const freezedTetromino = createDeepCopyFromTetromino(tetromino);
+    for(let i = 0; i < freezedTetromino.indices.length; i++){
+        if(freezedTetromino.indices[i] === CELL_TETROMINO)
+            freezedTetromino.indices[i] = CELL_FROZEN;        
+    }
+    return freezedTetromino;
+}
+
+export function isTickFall(tick :ITickManager): boolean {
+    tick.count ++;
+    return tick.count % tick.rate === 0;
 }
 
 export function tryKick(board: IBoard, tetromino: ITetromino, action: action): ITetromino {
@@ -122,8 +132,10 @@ export function setInput(): IInputManager {
     return {pressedKeys, inputs};
 }
 
-export function forceUserClickButton(pressedKeys: Set<string>, key: key): void{  
-        pressedKeys.delete(key);
+export function forceUserClickButton(pressedKeys: Set<string>, ...keys: key[]): void{  
+        keys.forEach(key => {
+            pressedKeys.delete(key);            
+        });
 }
 
 export function createDeepCopyFromTetromino(tetromino: ITetromino): ITetromino{
@@ -169,7 +181,7 @@ export function getRandomTetromino(): ITetromino{
     const tetrominos: ITetromino[] = []; 
     tetrominos.push(L_TETROMINO);
     //tetrominos.push(L_TETROMINO);
-    return tetrominos[Math.floor(Math.random() * tetrominos.length)];    
+    return createDeepCopyFromTetromino(tetrominos[Math.floor(Math.random() * tetrominos.length)]);    
 }
 
 export function buildBoardArray(): IBoard {
@@ -188,19 +200,21 @@ export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:
     const length = Math.sqrt(tetromino.indices.length);
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){
-            if(preservedTetromino.indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+            const cellValue = tetromino.indices[xyToIndex({x, y}, length)]
+            if(cellValue === CELL_TETROMINO){
                 const index = xyToIndex(addVec2({x, y}, preservedTetromino.coord), BOARD_WIDTH);                
-                const cell: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
-                cell.innerHTML = "";                
+                const cellElement: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
+                cellElement.innerHTML = "";
             }
         }
     }
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){
-            if(tetromino.indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){
+            const cellValue = tetromino.indices[xyToIndex({x, y}, length)]            
+            if(cellValue === CELL_TETROMINO || cellValue === CELL_FROZEN){
                 const index = xyToIndex(addVec2({x, y}, tetromino.coord), BOARD_WIDTH);                
-                const cell: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
-                cell.innerHTML =  CELL_TETROMINO.toString();                
+                const cellElement: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
+                cellElement.innerHTML =  cellValue.toString();                
             }
         }
     }
@@ -225,6 +239,11 @@ export function buildDivBoard(board: IBoard, containerId: string): void{
         }
         container.appendChild(row);
     }   
+}
+
+function isBusyCell(board: IBoard, coord:vec2): boolean{
+    const freeCellsStates: number[] = [CELL_EMPTY, CELL_TETROMINO];
+    return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
 }
 
 function xyToIndex(coord:vec2, maxX: number ): number {

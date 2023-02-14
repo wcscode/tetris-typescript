@@ -1,7 +1,15 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, } from "./const.js";
-function isBusyCell(board, coord) {
-    const freeCellsStates = [CELL_EMPTY, CELL_TETROMINO];
-    return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, } from "./const.js";
+export function freezeTetromino(tetromino) {
+    const freezedTetromino = createDeepCopyFromTetromino(tetromino);
+    for (let i = 0; i < freezedTetromino.indices.length; i++) {
+        if (freezedTetromino.indices[i] === CELL_TETROMINO)
+            freezedTetromino.indices[i] = CELL_FROZEN;
+    }
+    return freezedTetromino;
+}
+export function isTickFall(tick) {
+    tick.count++;
+    return tick.count % tick.rate === 0;
 }
 export function tryKick(board, tetromino, action) {
     if (action != "clockwise" && action != "counterClockwise")
@@ -93,8 +101,10 @@ export function setInput() {
     window.addEventListener("keyup", (event) => { pressedKeys.delete(event.key); });
     return { pressedKeys, inputs };
 }
-export function forceUserClickButton(pressedKeys, key) {
-    pressedKeys.delete(key);
+export function forceUserClickButton(pressedKeys, ...keys) {
+    keys.forEach(key => {
+        pressedKeys.delete(key);
+    });
 }
 export function createDeepCopyFromTetromino(tetromino) {
     return {
@@ -136,7 +146,7 @@ export function getRandomTetromino() {
     const tetrominos = [];
     tetrominos.push(L_TETROMINO);
     //tetrominos.push(L_TETROMINO);
-    return tetrominos[Math.floor(Math.random() * tetrominos.length)];
+    return createDeepCopyFromTetromino(tetrominos[Math.floor(Math.random() * tetrominos.length)]);
 }
 export function buildBoardArray() {
     const indices = [];
@@ -154,19 +164,21 @@ export function render(board, preservedTetromino, tetromino) {
     const length = Math.sqrt(tetromino.indices.length);
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
-            if (preservedTetromino.indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO) {
+            const cellValue = tetromino.indices[xyToIndex({ x, y }, length)];
+            if (cellValue === CELL_TETROMINO) {
                 const index = xyToIndex(addVec2({ x, y }, preservedTetromino.coord), BOARD_WIDTH);
-                const cell = document.querySelector(`[data-cell-id="${index}"]`);
-                cell.innerHTML = "";
+                const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
+                cellElement.innerHTML = "";
             }
         }
     }
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
-            if (tetromino.indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO) {
+            const cellValue = tetromino.indices[xyToIndex({ x, y }, length)];
+            if (cellValue === CELL_TETROMINO || cellValue === CELL_FROZEN) {
                 const index = xyToIndex(addVec2({ x, y }, tetromino.coord), BOARD_WIDTH);
-                const cell = document.querySelector(`[data-cell-id="${index}"]`);
-                cell.innerHTML = CELL_TETROMINO.toString();
+                const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
+                cellElement.innerHTML = cellValue.toString();
             }
         }
     }
@@ -190,6 +202,10 @@ export function buildDivBoard(board, containerId) {
         }
         container.appendChild(row);
     }
+}
+function isBusyCell(board, coord) {
+    const freeCellsStates = [CELL_EMPTY, CELL_TETROMINO];
+    return !freeCellsStates.some(cellState => cellState == board.indices[xyToIndex(coord, BOARD_WIDTH)]);
 }
 function xyToIndex(coord, maxX) {
     return coord.y * maxX + coord.x;
