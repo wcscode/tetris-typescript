@@ -12,15 +12,11 @@ export function tryKick(board, tetromino, action) {
     const wallKickData = wallsKicksDatas.find(f => f.from == tetromino.rotationState &&
         f.to == newRotationState(tetromino.rotationState, action == "clockwise" ?
             rotateTo.right : rotateTo.left));
-    // console.log('trykick',tetromino.rotationState, wallKickData) 
-    let count = 0;
     for (let i = 0; i < wallKickData.tests.length; ++i) {
         const tempTetromino = createDeepCopyFromTetromino(tetromino);
         tempTetromino.coord = addVec2(tempTetromino.coord, wallKickData.tests[i]);
         if (!willCollide(board, tempTetromino, action)) {
             tetromino = tempTetromino;
-            console.log(count);
-            count++;
             break;
         }
     }
@@ -56,7 +52,6 @@ export function setAction(tetromino, action) {
             break;
         }
         case "clockwise": {
-            // console.log("setaction", tetromino.coord)
             const { indices, rotationState } = tetromino;
             const length = Math.sqrt(indices.length);
             const currentIndices = Array.from(indices);
@@ -86,32 +81,20 @@ export function setAction(tetromino, action) {
     }
     return tetromino;
 }
-export function mapOfKeyAndMovements() {
-    const mapOfMovements = new Map();
-    mapOfMovements.set("ArrowLeft", "left");
-    mapOfMovements.set("ArrowRight", "right");
-    mapOfMovements.set("ArrowDown", "down");
-    mapOfMovements.set("a", "counterClockwise");
-    mapOfMovements.set("s", "clockwise");
-    return mapOfMovements;
-}
 export function setInput() {
+    const inputs = new Map();
+    inputs.set("ArrowLeft", "left");
+    inputs.set("ArrowRight", "right");
+    inputs.set("ArrowDown", "down");
+    inputs.set("a", "counterClockwise");
+    inputs.set("s", "clockwise");
     const pressedKeys = new Set();
-    const removedKeys = new Set();
-    document.addEventListener("keydown", function (event) {
-        if (!removedKeys.has(event.key))
-            pressedKeys.add(event.key);
-    });
-    document.addEventListener("keyup", function (event) {
-        pressedKeys.delete(event.key);
-        removedKeys.delete(event.key);
-    });
-    return { pressedKeys, removedKeys };
+    window.addEventListener("keydown", (event) => { pressedKeys.add(event.key); });
+    window.addEventListener("keyup", (event) => { pressedKeys.delete(event.key); });
+    return { pressedKeys, inputs };
 }
-export function forceUserClickButton(pressedKeys, removedKeys, key) {
-    if (pressedKeys.has(key))
-        pressedKeys.delete(key);
-    removedKeys.add(key);
+export function forceUserClickButton(pressedKeys, key) {
+    pressedKeys.delete(key);
 }
 export function createDeepCopyFromTetromino(tetromino) {
     return {

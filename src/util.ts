@@ -17,7 +17,7 @@ import {
     ROTATIONS_STATES,
     I_TETROMINO_WALL_KICK_DATA,
     JLTSZ_TETROMINO_WALL_KICK_DATA,
-    IInputManager,
+    IInputManager, 
    
 } from "./const.js";
 
@@ -36,15 +36,11 @@ export function tryKick(board: IBoard, tetromino: ITetromino, action: action): I
             f => f.from == tetromino.rotationState && 
             f.to == newRotationState(tetromino.rotationState, action == "clockwise" ? 
             rotateTo.right : rotateTo.left));
-           // console.log('trykick',tetromino.rotationState, wallKickData) 
-           let count = 0          
         for(let i = 0; i < wallKickData.tests.length; ++i) {    
             const tempTetromino =  createDeepCopyFromTetromino(tetromino);           
             tempTetromino.coord = addVec2(tempTetromino.coord, wallKickData.tests[i]);            
             if(!willCollide(board, tempTetromino, action)){
-                tetromino = tempTetromino;
-                console.log(count)
-                count++;
+                tetromino = tempTetromino;               
                 break;               
             }
         };  
@@ -82,8 +78,7 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
             tetromino.coord = addVec2(tetromino.coord, {x:0, y:1})
             break; 
         }
-        case "clockwise":{
-           // console.log("setaction", tetromino.coord)
+        case "clockwise":{           
             const {indices, rotationState} = tetromino;
             const length = Math.sqrt(indices.length);     
             const currentIndices = Array.from(indices);
@@ -114,34 +109,21 @@ export function setAction(tetromino: ITetromino, action: action): ITetromino {
     return tetromino;
 }
 
-export function mapOfKeyAndMovements(){
-    const mapOfMovements = new Map<key, action>();
-    mapOfMovements.set("ArrowLeft", "left");
-    mapOfMovements.set("ArrowRight", "right");
-    mapOfMovements.set("ArrowDown", "down");
-    mapOfMovements.set("a", "counterClockwise");    
-    mapOfMovements.set("s", "clockwise");
-    return mapOfMovements;
-}
-
 export function setInput(): IInputManager {
-    const pressedKeys = new Set<string>();
-    const removedKeys = new Set<string>();
-
-    document.addEventListener("keydown", function(event) {    
-        if(!removedKeys.has(event.key))             
-            pressedKeys.add(event.key);       
-    });
-    document.addEventListener("keyup", function(event) {
-        pressedKeys.delete(event.key); 
-        removedKeys.delete(event.key);       
-    });
-    return {pressedKeys, removedKeys};
+    const inputs = new Map<key, action>();
+    inputs.set("ArrowLeft", "left");
+    inputs.set("ArrowRight", "right");
+    inputs.set("ArrowDown", "down");
+    inputs.set("a", "counterClockwise");    
+    inputs.set("s", "clockwise");
+    const pressedKeys = new Set<string>();    
+    window.addEventListener("keydown", (event) => {  pressedKeys.add(event.key); }); 
+    window.addEventListener("keyup", (event) => {  pressedKeys.delete(event.key); });   
+    return {pressedKeys, inputs};
 }
-export function forceUserClickButton(pressedKeys: Set<string>, removedKeys: Set<string>, key: key): void{
-    if(pressedKeys.has(key))
-        pressedKeys.delete(key);  
-    removedKeys.add(key);
+
+export function forceUserClickButton(pressedKeys: Set<string>, key: key): void{  
+        pressedKeys.delete(key);
 }
 
 export function createDeepCopyFromTetromino(tetromino: ITetromino): ITetromino{

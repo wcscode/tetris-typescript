@@ -8,8 +8,7 @@ import {
 import { 
   buildBoardArray, 
   clearTetrominosFromBoard, 
-  getRandomTetromino, 
-  mapOfKeyAndMovements,   
+  getRandomTetromino,
   setInput,
   setAction,
   putTetrominoInsideBoard,
@@ -21,25 +20,23 @@ import {
   forceUserClickButton
 } from "./util.js";
 
-const {pressedKeys, removedKeys} = setInput();
-const inputsMaps = mapOfKeyAndMovements();
+const {pressedKeys, inputs} = setInput();
 let board: IBoard = buildBoardArray();
 buildDivBoard(board, "board");
 let tetromino: ITetromino = getRandomTetromino();
 board = putTetrominoInsideBoard(board, tetromino);
 function update(){
     const preservedTetromino = createDeepCopyFromTetromino(tetromino);
-    inputsMaps.forEach((action: action, key: key) => {        
+    inputs.forEach((action: action, key: key) => {        
         if (pressedKeys.has(key)) {
             const tempTetromino =  createDeepCopyFromTetromino(tetromino);                      
             tetromino = !willCollide(board, tempTetromino, action) ?
               setAction(tetromino, action) :
               tryKick(board, tetromino, action);  
-            forceUserClickButton(pressedKeys, removedKeys, "a");  
-            forceUserClickButton(pressedKeys, removedKeys, "s"); 
         }            
     }); 
-         
+    forceUserClickButton(pressedKeys, "a");  
+    forceUserClickButton(pressedKeys, "s");  
     board = clearTetrominosFromBoard(board, preservedTetromino);      
     board = putTetrominoInsideBoard(board, tetromino);
     render(board, preservedTetromino, tetromino);
