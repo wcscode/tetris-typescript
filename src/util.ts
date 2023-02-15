@@ -35,9 +35,7 @@ export function isTickFall(tick :ITickManager): boolean {
     return tick.count % tick.rate === 0;
 }
 
-export function tryKick(board: IBoard, tetromino: ITetromino, action: action): ITetromino {
-    if(action != "clockwise" && action != "counterClockwise")   
-        return tetromino;       
+export function tryKick(board: IBoard, tetromino: ITetromino, action: action): ITetromino {      
     const wallsKicksDatas = tetromino.name == "I" ? 
         I_TETROMINO_WALL_KICK_DATA : 
         JLTSZ_TETROMINO_WALL_KICK_DATA;        
@@ -129,13 +127,12 @@ export function setInput(): IInputManager {
     const pressedKeys = new Set<string>();    
     window.addEventListener("keydown", (event) => {  pressedKeys.add(event.key); }); 
     window.addEventListener("keyup", (event) => {  pressedKeys.delete(event.key); });   
-    return {pressedKeys, inputs};
-}
-
-export function forceUserClickButton(pressedKeys: Set<string>, ...keys: key[]): void{  
-        keys.forEach(key => {
-            pressedKeys.delete(key);            
-        });
+    return {
+        pressedKeys, 
+        inputs, 
+        keydown: (...keys: key[]): void => { keys.forEach(key => { pressedKeys.add(key); }); }, 
+        keyup : (...keys: key[]): void => { keys.forEach(key => { pressedKeys.delete(key); })}
+    };
 }
 
 export function createDeepCopyFromTetromino(tetromino: ITetromino): ITetromino{
@@ -196,18 +193,29 @@ export function buildBoardArray(): IBoard {
     return {indices: indices};    
 }
 
-export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:ITetromino): void{
+export function render(board: IBoard, tetromino:ITetromino): void{
+    const length = Math.sqrt(tetromino.indices.length);
+    
+    board.indices.forEach((cell, index) => {
+        const cellElement: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`);
+        cellElement.innerHTML =  board.indices[index] == CELL_EMPTY ? "" : board.indices[index].toString();
+    });
+   
+    document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
+    document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
+}
+/*export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:ITetromino): void{
     const length = Math.sqrt(tetromino.indices.length);
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){
-            const cellValue = tetromino.indices[xyToIndex({x, y}, length)]
+            const cellValue = tetromino.indices[xyToIndex({x, y}, length)];           
             if(cellValue === CELL_TETROMINO){
                 const index = xyToIndex(addVec2({x, y}, preservedTetromino.coord), BOARD_WIDTH);                
                 const cellElement: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
                 cellElement.innerHTML = "";
             }
         }
-    }
+    }  
     for(let y = 0; y <length; ++y){
         for(let x = 0; x <length; ++x){
             const cellValue = tetromino.indices[xyToIndex({x, y}, length)]            
@@ -220,7 +228,7 @@ export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:
     }
     document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
     document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
-}
+}*/
 
 export function buildDivBoard(board: IBoard, containerId: string): void{
     const container: HTMLElement | null = document.getElementById(containerId);

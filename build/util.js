@@ -11,8 +11,6 @@ export function isTickFall(tick) {
     return tick.count % tick.rate === 0;
 }
 export function tryKick(board, tetromino, action) {
-    if (action != "clockwise" && action != "counterClockwise")
-        return tetromino;
     const wallsKicksDatas = tetromino.name == "I" ?
         I_TETROMINO_WALL_KICK_DATA :
         JLTSZ_TETROMINO_WALL_KICK_DATA;
@@ -99,12 +97,12 @@ export function setInput() {
     const pressedKeys = new Set();
     window.addEventListener("keydown", (event) => { pressedKeys.add(event.key); });
     window.addEventListener("keyup", (event) => { pressedKeys.delete(event.key); });
-    return { pressedKeys, inputs };
-}
-export function forceUserClickButton(pressedKeys, ...keys) {
-    keys.forEach(key => {
-        pressedKeys.delete(key);
-    });
+    return {
+        pressedKeys,
+        inputs,
+        keydown: (...keys) => { keys.forEach(key => { pressedKeys.add(key); }); },
+        keyup: (...keys) => { keys.forEach(key => { pressedKeys.delete(key); }); }
+    };
 }
 export function createDeepCopyFromTetromino(tetromino) {
     return {
@@ -160,31 +158,40 @@ export function buildBoardArray() {
     }
     return { indices: indices };
 }
-export function render(board, preservedTetromino, tetromino) {
+export function render(board, tetromino) {
     const length = Math.sqrt(tetromino.indices.length);
-    for (let y = 0; y < length; ++y) {
-        for (let x = 0; x < length; ++x) {
-            const cellValue = tetromino.indices[xyToIndex({ x, y }, length)];
-            if (cellValue === CELL_TETROMINO) {
-                const index = xyToIndex(addVec2({ x, y }, preservedTetromino.coord), BOARD_WIDTH);
-                const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
+    board.indices.forEach((cell, index) => {
+        const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
+        cellElement.innerHTML = board.indices[index] == CELL_EMPTY ? "" : board.indices[index].toString();
+    });
+    document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
+    document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
+}
+/*export function render(board: IBoard, preservedTetromino: ITetromino, tetromino:ITetromino): void{
+    const length = Math.sqrt(tetromino.indices.length);
+    for(let y = 0; y <length; ++y){
+        for(let x = 0; x <length; ++x){
+            const cellValue = tetromino.indices[xyToIndex({x, y}, length)];
+            if(cellValue === CELL_TETROMINO){
+                const index = xyToIndex(addVec2({x, y}, preservedTetromino.coord), BOARD_WIDTH);
+                const cellElement: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
                 cellElement.innerHTML = "";
             }
         }
     }
-    for (let y = 0; y < length; ++y) {
-        for (let x = 0; x < length; ++x) {
-            const cellValue = tetromino.indices[xyToIndex({ x, y }, length)];
-            if (cellValue === CELL_TETROMINO || cellValue === CELL_FROZEN) {
-                const index = xyToIndex(addVec2({ x, y }, tetromino.coord), BOARD_WIDTH);
-                const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
-                cellElement.innerHTML = cellValue.toString();
+    for(let y = 0; y <length; ++y){
+        for(let x = 0; x <length; ++x){
+            const cellValue = tetromino.indices[xyToIndex({x, y}, length)]
+            if(cellValue === CELL_TETROMINO || cellValue === CELL_FROZEN){
+                const index = xyToIndex(addVec2({x, y}, tetromino.coord), BOARD_WIDTH);
+                const cellElement: HTMLElement = document.querySelector(`[data-cell-id="${index}"]`)
+                cellElement.innerHTML =  cellValue.toString();
             }
         }
     }
     document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
     document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
-}
+}*/
 export function buildDivBoard(board, containerId) {
     const container = document.getElementById(containerId);
     if (container == null)

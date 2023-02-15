@@ -12,6 +12,8 @@ export interface IBoard{
 export interface IInputManager{
     pressedKeys: Set<string>;
     inputs: Map<key,action>;
+    keydown: Function;
+    keyup: Function;
 }
 export interface ITickManager{
     count: number;
