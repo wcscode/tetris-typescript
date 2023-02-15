@@ -1,11 +1,10 @@
 import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, } from "./const.js";
 export function freezeTetromino(tetromino) {
-    const freezedTetromino = createDeepCopyFromTetromino(tetromino);
-    for (let i = 0; i < freezedTetromino.indices.length; i++) {
-        if (freezedTetromino.indices[i] === CELL_TETROMINO)
-            freezedTetromino.indices[i] = CELL_FROZEN;
+    for (let i = 0; i < tetromino.indices.length; i++) {
+        if (tetromino.indices[i] === CELL_TETROMINO)
+            tetromino.indices[i] = CELL_FROZEN;
     }
-    return freezedTetromino;
+    return tetromino;
 }
 export function isTickFall(tick) {
     tick.count++;
@@ -37,7 +36,8 @@ export function willCollide(board, tempTetromino, action) {
     const length = Math.sqrt(indices.length);
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
-            if (indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO) {
+            const indice = indices[xyToIndex({ x, y }, length)];
+            if (indice === CELL_TETROMINO || indice === CELL_FROZEN) {
                 if (isBusyCell(board, addVec2({ x, y }, coord)))
                     return true;
             }

@@ -22,13 +22,12 @@ import {
    
 } from "./const.js";
 
-export function freezeTetromino(tetromino: ITetromino): ITetromino {
-    const freezedTetromino = createDeepCopyFromTetromino(tetromino);
-    for(let i = 0; i < freezedTetromino.indices.length; i++){
-        if(freezedTetromino.indices[i] === CELL_TETROMINO)
-            freezedTetromino.indices[i] = CELL_FROZEN;        
+export function freezeTetromino(tetromino: ITetromino): ITetromino {    
+    for(let i = 0; i < tetromino.indices.length; i++){
+        if(tetromino.indices[i] === CELL_TETROMINO)
+        tetromino.indices[i] = CELL_FROZEN;        
     }
-    return freezedTetromino;
+    return tetromino;
 }
 
 export function isTickFall(tick :ITickManager): boolean {
@@ -62,8 +61,9 @@ export function willCollide(board: IBoard, tempTetromino: ITetromino, action: ac
     const {indices, coord} = setAction(tempTetromino, action);
     const length = Math.sqrt(indices.length); 
     for(let y = 0; y <length; ++y){
-        for(let x = 0; x <length; ++x){          
-           if(indices[xyToIndex({x, y}, length)] === CELL_TETROMINO){                  
+        for(let x = 0; x <length; ++x){    
+           const indice = indices[xyToIndex({x, y}, length)];       
+           if(indice === CELL_TETROMINO || indice === CELL_FROZEN){                  
                 if(isBusyCell(board, addVec2({x, y}, coord)))
                     return true;                
            }

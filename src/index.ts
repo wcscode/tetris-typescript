@@ -39,22 +39,29 @@ function update(){
               tryKick(board, tetromino, action);  
         }            
     }); 
-    forceUserClickButton(pressedKeys, "a", "s");      
-    board = clearTetrominosFromBoard(board, preservedTetromino);      
-    board = putTetrominoInsideBoard(board, tetromino);
+    forceUserClickButton(pressedKeys, "a", "s");  
     if(isTickFall(tick)){      
-      const tempTetromino =  createDeepCopyFromTetromino(tetromino);                      
-      if(willCollide(board, tempTetromino, "down")){       
-        const freezedTetromino = freezeTetromino(tetromino);
-        console.log(freezedTetromino);
-        render(board, preservedTetromino, freezedTetromino);
-        tetromino = getRandomTetromino();
+      const tempTetromino = createDeepCopyFromTetromino(tetromino);                      
+      if(willCollide(board, tempTetromino, "down")) {      
+        tetromino = freezeTetromino(tetromino);
+        board = clearTetrominosFromBoard(board, preservedTetromino);      
+        board = putTetrominoInsideBoard(board, tetromino);
+        render(board, preservedTetromino, tetromino);
+        tetromino = getRandomTetromino();     
       }else{
-       tetromino = setAction(tetromino, "down");
-      }      
+        tetromino = setAction(tetromino, "down");
+        board = clearTetrominosFromBoard(board, preservedTetromino);      
+        board = putTetrominoInsideBoard(board, tetromino);
+        render(board, preservedTetromino, tetromino);
+      }           
+    }else{
+      board = clearTetrominosFromBoard(board, preservedTetromino);      
+      board = putTetrominoInsideBoard(board, tetromino);
+      render(board, preservedTetromino, tetromino);
     }
-    render(board, preservedTetromino, tetromino);
     
+   // if(tickFall)
+     // tetromino = getRandomTetromino();
   }
  
 update();
