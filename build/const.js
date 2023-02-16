@@ -34,17 +34,6 @@ export const I_TETROMINO_WALL_KICK_DATA = [
     { from: "left", to: "spawn", tests: [{ x: 1, y: 0 }, { x: -2, y: 0 }, { x: 1, y: -2 }, { x: -2, y: 1 }] },
     { from: "spawn", to: "left", tests: [{ x: -1, y: 0 }, { x: 2, y: 0 }, { x: -1, y: 2 }, { x: 2, y: -1 }] },
 ];
-/*export const I_TETROMINO: ITetromino =
-{
-    name: "I",
-    coord: {x:4 , y:0},
-    indices: [
-        0, CELL_TETROMINO, 0, 0,
-        0, CELL_TETROMINO, 0, 0,
-        0, CELL_TETROMINO, 0, 0,
-        0, CELL_TETROMINO, 0, 0
-    ]
-}*/
 export const L_TETROMINO = {
     name: "L",
     coord: { x: 0, y: 0 },
@@ -55,13 +44,3 @@ export const L_TETROMINO = {
         0, CELL_TETROMINO, CELL_TETROMINO,
     ]
 };
-/*
-export const O_TETROMINO: ITetromino =
-{
-    name: "O",
-    indices: [
-        1, 1,
-        1, 1
-        
-    ]
-}*/
