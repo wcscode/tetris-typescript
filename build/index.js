@@ -1,5 +1,5 @@
 import { UPDATE_FRAME_IN_MILLISECONDS, } from "./const.js";
-import { buildBoardArray, clearTetrominosFromBoard, getRandomTetromino, setInput, setAction, putTetrominoInsideBoard, createDeepCopyFromTetromino, willCollide, buildDivBoard, render, tryKick, isTickFall, freezeTetromino } from "./util.js";
+import { buildBoardArray, clearTetrominoFromBoard, getRandomTetromino, setInput, setAction, putTetrominoInsideBoard, createDeepCopyFromTetromino, willCollide, buildDivBoard, render, tryKick, isTickFall, freezeTetromino } from "./util.js";
 const { pressedKeys, inputs, keydown, keyup } = setInput();
 let board = buildBoardArray();
 buildDivBoard(board, "board");
@@ -7,7 +7,7 @@ let tetromino = getRandomTetromino();
 board = putTetrominoInsideBoard(board, tetromino);
 const tick = { count: 0, rate: 10 };
 function update() {
-    const preservedTetromino = createDeepCopyFromTetromino(tetromino);
+    let preservedTetromino = createDeepCopyFromTetromino(tetromino);
     const tickFall = isTickFall(tick);
     if (tickFall)
         keydown("ArrowDown");
@@ -18,12 +18,13 @@ function update() {
                 switch (action) {
                     case "clockwise":
                     case "counterClockwise":
-                        tetromino = tryKick(board, tetromino, action);
+                        tetromino = tryKick(board, tempTetromino, tetromino, action);
                         break;
                     case "down":
                         if (tickFall) {
                             tetromino = freezeTetromino(tetromino);
-                            tetromino = getRandomTetromino();
+                            board = putTetrominoInsideBoard(board, tetromino);
+                            preservedTetromino = tetromino = getRandomTetromino();
                         }
                 }
             }
@@ -35,11 +36,9 @@ function update() {
     keyup("a", "s");
     if (tickFall)
         keyup("ArrowDown");
-    board = clearTetrominosFromBoard(board, preservedTetromino);
+    board = clearTetrominoFromBoard(board, preservedTetromino);
     board = putTetrominoInsideBoard(board, tetromino);
     render(board, tetromino);
-    // if(tickFall)
-    // tetromino = getRandomTetromino();
 }
 update();
 //update();

@@ -10,15 +10,14 @@ export function isTickFall(tick) {
     tick.count++;
     return tick.count % tick.rate === 0;
 }
-export function tryKick(board, tetromino, action) {
-    const wallsKicksDatas = tetromino.name == "I" ?
+export function tryKick(board, tempTetromino, tetromino, action) {
+    const wallsKicksDatas = tempTetromino.name == "I" ?
         I_TETROMINO_WALL_KICK_DATA :
         JLTSZ_TETROMINO_WALL_KICK_DATA;
-    const wallKickData = wallsKicksDatas.find(f => f.from == tetromino.rotationState &&
-        f.to == newRotationState(tetromino.rotationState, action == "clockwise" ?
+    const wallKickData = wallsKicksDatas.find(f => f.from == tempTetromino.rotationState &&
+        f.to == newRotationState(tempTetromino.rotationState, action == "clockwise" ?
             rotateTo.right : rotateTo.left));
     for (let i = 0; i < wallKickData.tests.length; ++i) {
-        const tempTetromino = createDeepCopyFromTetromino(tetromino);
         tempTetromino.coord = addVec2(tempTetromino.coord, wallKickData.tests[i]);
         if (!willCollide(board, tempTetromino, action)) {
             tetromino = tempTetromino;
@@ -112,7 +111,7 @@ export function createDeepCopyFromTetromino(tetromino) {
         indices: Array.from(tetromino.indices)
     };
 }
-export function clearTetrominosFromBoard(board, tetromino) {
+export function clearTetrominoFromBoard(board, tetromino) {
     const { coord, indices } = tetromino;
     const length = Math.sqrt(indices.length);
     for (let y = 0; y < length; ++y) {
@@ -133,8 +132,9 @@ export function putTetrominoInsideBoard(board, tetromino) {
     const length = Math.sqrt(indices.length);
     for (let y = 0; y < length; ++y) {
         for (let x = 0; x < length; ++x) {
-            if (indices[xyToIndex({ x, y }, length)] === CELL_TETROMINO) {
-                board.indices[xyToIndex(addVec2({ x, y }, coord), BOARD_WIDTH)] = CELL_TETROMINO;
+            const cellValue = indices[xyToIndex({ x, y }, length)];
+            if (cellValue === CELL_TETROMINO || cellValue === CELL_FROZEN) {
+                board.indices[xyToIndex(addVec2({ x, y }, coord), BOARD_WIDTH)] = cellValue;
             }
         }
     }
@@ -159,7 +159,6 @@ export function buildBoardArray() {
     return { indices: indices };
 }
 export function render(board, tetromino) {
-    const length = Math.sqrt(tetromino.indices.length);
     board.indices.forEach((cell, index) => {
         const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
         cellElement.innerHTML = board.indices[index] == CELL_EMPTY ? "" : board.indices[index].toString();

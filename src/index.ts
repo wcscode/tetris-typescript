@@ -8,7 +8,7 @@ import {
 } from "./const.js";
 import { 
   buildBoardArray, 
-  clearTetrominosFromBoard, 
+  clearTetrominoFromBoard, 
   getRandomTetromino,
   setInput,
   setAction,
@@ -29,7 +29,7 @@ let tetromino: ITetromino = getRandomTetromino();
 board = putTetrominoInsideBoard(board, tetromino);
 const tick:ITickManager = {count:0, rate:10};  
 function update(){
-    const preservedTetromino = createDeepCopyFromTetromino(tetromino);
+    let preservedTetromino = createDeepCopyFromTetromino(tetromino);
     const tickFall = isTickFall(tick);
     if(tickFall)
      keydown("ArrowDown");
@@ -41,30 +41,26 @@ function update(){
           switch(action){
             case "clockwise": 
             case "counterClockwise":
-              tetromino = tryKick(board, tetromino, action);
+              tetromino = tryKick(board, tempTetromino, tetromino, action);
               break;
             case "down":
               if(tickFall){
                 tetromino = freezeTetromino(tetromino);
-                tetromino = getRandomTetromino();
+                board = putTetrominoInsideBoard(board, tetromino);
+                preservedTetromino = tetromino = getRandomTetromino();
               }
-           }
-          }else{
-            tetromino = setAction(tetromino, action);
           }
-        }            
+        }else{
+          tetromino = setAction(tetromino, action);
+        }
+      }            
     }); 
     keyup("a", "s"); 
     if(tickFall) 
       keyup("ArrowDown");
-
-     
-
-    board = clearTetrominosFromBoard(board, preservedTetromino); 
+    board = clearTetrominoFromBoard(board, preservedTetromino); 
     board = putTetrominoInsideBoard(board, tetromino);
     render(board, tetromino);
-   // if(tickFall)
-     // tetromino = getRandomTetromino();
   }
  
 update();
