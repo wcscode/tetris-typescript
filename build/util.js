@@ -159,13 +159,26 @@ export function buildBoardArray() {
     }
     return { indices: indices };
 }
-export function render(board, tetromino) {
+export function gravity(board) {
+    const newBoard = createDeepCopyFromBoard(board);
+    for (let y = BOARD_HEIGHT - 1; y >= 0; --y) {
+        for (let x = 0; x < BOARD_WIDTH; ++x) {
+            const bottomRow = addVec2({ x, y }, { x: 0, y: 1 });
+            //console.log(BOARD_HEIGHT -1)
+            if (board[xyToIndex(bottomRow, BOARD_WIDTH)] == CELL_EMPTY)
+                newBoard[xyToIndex({ x, y }, BOARD_WIDTH)] = board[xyToIndex(bottomRow, BOARD_WIDTH)];
+        }
+    }
+    return newBoard;
+}
+export function render(board, tetromino, pressedKeys) {
     board.indices.forEach((_, index) => {
         const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
         cellElement.innerHTML = board.indices[index] == CELL_EMPTY ? "" : board.indices[index].toString();
     });
     document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
     document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
+    document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys).reduce((a, b) => a + " " + b, "")}`;
 }
 export function buildDivBoard(board, containerId) {
     const container = document.getElementById(containerId);

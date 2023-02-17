@@ -20,7 +20,8 @@ import {
   render,
   tryKick, 
   isTickFall,
-  freezeTetromino
+  freezeTetromino,
+  gravity
 } from "./util.js";
 
 const {pressedKeys, inputs, keydown, keyup} = setInput();
@@ -34,11 +35,10 @@ board = putTetrominoInsideBoard(board, tetromino);
 
 function update() {
 
-    let preservedTetromino = createDeepCopyFromTetromino(tetromino);
     const tickFall = isTickFall(tick);
 
     if(tickFall)
-      keydown("ArrowDown");
+      board = gravity(board);
 
     inputs.forEach((action: action, key: key) => {        
 
@@ -59,8 +59,8 @@ function update() {
               if(tickFall) {
 
                 tetromino = freezeTetromino(tetromino);             
-                board = putTetrominoInsideBoard(board, tetromino);
-                preservedTetromino = tetromino = getRandomTetromino();
+                board = putTetrominoInsideBoard(board, tetromino);                
+                tetromino = getRandomTetromino();
               }
             }
           }          
@@ -72,15 +72,15 @@ function update() {
       }            
     }); 
 
-    keyup("a", "s"); 
+ //   keyup("a", "s"); 
 
-    if(tickFall) 
-      keyup("ArrowDown");
+   // if(tickFall) 
+   //   keyup("ArrowDown");
 
     board = clearTetrominoFromBoard(board); 
     board = putTetrominoInsideBoard(board, tetromino);
 
-    render(board, tetromino);
+    render(board, tetromino, pressedKeys);
   }
 
 setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);

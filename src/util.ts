@@ -263,7 +263,25 @@ export function buildBoardArray(): IBoard {
     return {indices: indices};    
 }
 
-export function render(board: IBoard, tetromino:ITetromino): void {
+export function gravity(board: IBoard) {
+  
+    const newBoard = createDeepCopyFromBoard(board);
+
+    for(let y: number = BOARD_HEIGHT -1; y >= 0; --y){
+
+        for(let x: number = 0; x < BOARD_WIDTH; ++x){
+
+            const bottomRow:vec2 = addVec2({x,y}, {x:0, y:1});
+            //console.log(BOARD_HEIGHT -1)
+            if(board[xyToIndex(bottomRow, BOARD_WIDTH)] == CELL_EMPTY)
+                newBoard[xyToIndex({x, y}, BOARD_WIDTH)] = board[xyToIndex(bottomRow, BOARD_WIDTH)]
+        }
+    }
+ 
+    return newBoard;
+}
+
+export function render(board: IBoard, tetromino:ITetromino, pressedKeys: Set<string>): void {
   
     board.indices.forEach((_, index) => {
 
@@ -273,6 +291,7 @@ export function render(board: IBoard, tetromino:ITetromino): void {
    
     document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
     document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
+    document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys).reduce((a, b) => a + " " + b, "")}`;
 }
 
 export function buildDivBoard(board: IBoard, containerId: string): void {
