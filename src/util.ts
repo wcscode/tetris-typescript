@@ -196,7 +196,7 @@ export function createDeepCopyFromBoard(board: IBoard): IBoard {
     return { 
 
         indices: Array.from(board.indices), 
-        filledRows: Array.from(board.filledRows) 
+        destroyedRows: Array.from(board.destroyedRows) 
     };
 }
 
@@ -265,14 +265,13 @@ export function buildBoardArray(): IBoard {
         }
     }
 
-    return {indices: indices, filledRows:[]};    
+    return {indices: indices, destroyedRows:[]};    
 }
 
 export function destroyFilledRow(board: IBoard): IBoard{
 
     const newBoard: IBoard = createDeepCopyFromBoard(board);
-    const destroyedRows: number[] = [];
-
+    
     for(let y: number = BOARD_INNER_HEIGHT; y >= 0; --y){
 
         let rowIsBusy: boolean = true;
@@ -291,31 +290,33 @@ export function destroyFilledRow(board: IBoard): IBoard{
             for(let x: number = 1; x < BOARD_INNER_WIDTH; ++x)           
                 newBoard.indices[xyToIndex({x, y}, BOARD_WIDTH)] = CELL_EMPTY;
     
-            newBoard.filledRows.push(y)     
+            newBoard.destroyedRows.push(y)     
         }
     }
 
     return newBoard;
 }
 
-export function gravity(board: IBoard) {
+export function applyGravity(board: IBoard): IBoard {
   
     const newBoard: IBoard = createDeepCopyFromBoard(board);
+    
+    for(let y: number = BOARD_INNER_HEIGHT; y > 0; --y){
 
-    for(let y: number = BOARD_INNER_HEIGHT; y >= 0; --y){
+        const stepsDown: number = board.destroyedRows.filter( f => f > y).length;
+        
+        if(stepsDown > 0){
+            
+           for(let x: number = 1; x < BOARD_INNER_WIDTH; ++x){
 
-        for(let x: number = 1; x < BOARD_INNER_WIDTH; ++x){
+                const cellValue: number = board.indices[xyToIndex({x, y}, BOARD_WIDTH)];
+                const coordCellBelow:vec2 = addVec2({x, y}, {x:0, y:stepsDown});
 
-            const bottomRow: vec2 = addVec2({x,y}, {x:0, y:1});
-            let cellValue = board.indices[xyToIndex({x, y}, BOARD_WIDTH)];
-            const cellBottomRowValue = board.indices[xyToIndex(bottomRow, BOARD_WIDTH)];
-
-            if(cellBottomRowValue == CELL_EMPTY){
-                newBoard.indices[xyToIndex(bottomRow, BOARD_WIDTH)] = cellValue;                              
-            }           
+                newBoard.indices[xyToIndex(coordCellBelow, BOARD_WIDTH)] = cellValue;
+            }
         }
     }
- 
+    newBoard.destroyedRows = [];
     return newBoard;
 }
 

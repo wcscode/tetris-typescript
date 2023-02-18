@@ -13,7 +13,7 @@ export interface vec2 {
 export interface IBoard {
 
     indices: number[];
-    filledRows: number[];
+    destroyedRows: number[];
 }
 
 export interface IInputManager {

@@ -21,8 +21,8 @@ import {
   tryKick, 
   isTickFall,
   freezeTetromino,
-  gravity,
-  destroyFilledRow
+  destroyFilledRow,
+  applyGravity
 } from "./util.js";
 
 //const {pressedKeys, inputs, keydown, keyup} = setInput();
@@ -37,11 +37,6 @@ board = putTetrominoInsideBoard(board, tetromino);
 
 function update() {
 
-    const tickFall = isTickFall(tick);
-
-    //if(tickFall)
-   //   board = gravity(board);
-
     pressedKeys.forEach((action: action, _) => { 
         
         if(willCollide(board, tetromino, action)){
@@ -55,7 +50,7 @@ function update() {
         }
     });
     
-    if(tickFall){
+    if(isTickFall(tick)){
 
       if(willCollide(board, tetromino, "down")){
 
@@ -69,6 +64,7 @@ function update() {
       }
 
       board = destroyFilledRow(board);
+      board = applyGravity(board);
     }
 
     board = clearTetrominoFromBoard(board); 

@@ -117,7 +117,7 @@ export function createDeepCopyFromTetromino(tetromino) {
 export function createDeepCopyFromBoard(board) {
     return {
         indices: Array.from(board.indices),
-        filledRows: Array.from(board.filledRows)
+        destroyedRows: Array.from(board.destroyedRows)
     };
 }
 export function clearTetrominoFromBoard(board) {
@@ -160,11 +160,10 @@ export function buildBoardArray() {
             indices.push(status);
         }
     }
-    return { indices: indices, filledRows: [] };
+    return { indices: indices, destroyedRows: [] };
 }
 export function destroyFilledRow(board) {
     const newBoard = createDeepCopyFromBoard(board);
-    const destroyedRows = [];
     for (let y = BOARD_INNER_HEIGHT; y >= 0; --y) {
         let rowIsBusy = true;
         for (let x = 1; x <= BOARD_INNER_WIDTH; ++x) {
@@ -176,23 +175,24 @@ export function destroyFilledRow(board) {
         if (rowIsBusy) {
             for (let x = 1; x < BOARD_INNER_WIDTH; ++x)
                 newBoard.indices[xyToIndex({ x, y }, BOARD_WIDTH)] = CELL_EMPTY;
-            newBoard.filledRows.push(y);
+            newBoard.destroyedRows.push(y);
         }
     }
     return newBoard;
 }
-export function gravity(board) {
+export function applyGravity(board) {
     const newBoard = createDeepCopyFromBoard(board);
-    for (let y = BOARD_INNER_HEIGHT; y >= 0; --y) {
-        for (let x = 1; x < BOARD_INNER_WIDTH; ++x) {
-            const bottomRow = addVec2({ x, y }, { x: 0, y: 1 });
-            let cellValue = board.indices[xyToIndex({ x, y }, BOARD_WIDTH)];
-            const cellBottomRowValue = board.indices[xyToIndex(bottomRow, BOARD_WIDTH)];
-            if (cellBottomRowValue == CELL_EMPTY) {
-                newBoard.indices[xyToIndex(bottomRow, BOARD_WIDTH)] = cellValue;
+    for (let y = BOARD_INNER_HEIGHT; y > 0; --y) {
+        const stepsDown = board.destroyedRows.filter(f => f > y).length;
+        if (stepsDown > 0) {
+            for (let x = 1; x < BOARD_INNER_WIDTH; ++x) {
+                const cellValue = board.indices[xyToIndex({ x, y }, BOARD_WIDTH)];
+                const coordCellBelow = addVec2({ x, y }, { x: 0, y: stepsDown });
+                newBoard.indices[xyToIndex(coordCellBelow, BOARD_WIDTH)] = cellValue;
             }
         }
     }
+    newBoard.destroyedRows = [];
     return newBoard;
 }
 export function render(board, tetromino, pressedKeys) {
