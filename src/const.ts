@@ -1,5 +1,5 @@
 export type action = "left" | "right" | "down" | "up" | "clockwise" | "counterClockwise";
-export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
+//export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
 export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"; 
 export type rotationState = "spawn" | "right" | "left" | "twoRotation";
 export enum rotateTo { left = -1, right = 1};
@@ -13,14 +13,15 @@ export interface vec2 {
 export interface IBoard {
 
     indices: number[];
+    filledRows: number[];
 }
 
 export interface IInputManager {
 
-    pressedKeys: Set<string>;
-    inputs: Map<key,action>;
-    keydown: Function;
-    keyup: Function;
+    pressedKeys: Map<string,action>;
+   // inputs: Map<key,action>;
+   // keydown: Function;
+   // keyup: Function;
 }
 export interface ITickManager {
 
@@ -45,6 +46,8 @@ export interface IRotationState {
 
 export const BOARD_WIDTH: number = 12;
 export const BOARD_HEIGHT: number = 21;
+export const BOARD_INNER_WIDTH: number = BOARD_WIDTH - 1;
+export const BOARD_INNER_HEIGHT: number = BOARD_HEIGHT - 2;
 export const CELL_EMPTY: number = 0;
 export const CELL_WALL: number = 1;
 export const CELL_FROZEN: number = 2;

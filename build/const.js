@@ -7,6 +7,8 @@ export var rotateTo;
 ;
 export const BOARD_WIDTH = 12;
 export const BOARD_HEIGHT = 21;
+export const BOARD_INNER_WIDTH = BOARD_WIDTH - 1;
+export const BOARD_INNER_HEIGHT = BOARD_HEIGHT - 2;
 export const CELL_EMPTY = 0;
 export const CELL_WALL = 1;
 export const CELL_FROZEN = 2;

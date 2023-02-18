@@ -1,4 +1,4 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, } from "./const.js";
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, BOARD_INNER_HEIGHT, BOARD_INNER_WIDTH, } from "./const.js";
 export function freezeTetromino(tetromino) {
     const newTetromino = createDeepCopyFromTetromino(tetromino);
     for (let i = 0; i < newTetromino.indices.length; i++) {
@@ -90,20 +90,20 @@ export function setAction(tetromino, action) {
     return newTetromino;
 }
 export function setInput() {
-    const inputs = new Map();
-    inputs.set("ArrowLeft", "left");
-    inputs.set("ArrowRight", "right");
-    inputs.set("ArrowDown", "down");
-    inputs.set("a", "counterClockwise");
-    inputs.set("s", "clockwise");
-    const pressedKeys = new Set();
-    window.addEventListener("keydown", (event) => { pressedKeys.add(event.key); });
+    const allowedInputs = new Map();
+    allowedInputs.set("ArrowLeft", "left");
+    allowedInputs.set("ArrowRight", "right");
+    allowedInputs.set("ArrowDown", "down");
+    allowedInputs.set("a", "counterClockwise");
+    allowedInputs.set("s", "clockwise");
+    const pressedKeys = new Map();
+    window.addEventListener("keydown", (event) => { if (allowedInputs.has(event.key))
+        pressedKeys.set(event.key, allowedInputs.get(event.key)); });
     window.addEventListener("keyup", (event) => { pressedKeys.delete(event.key); });
     return {
         pressedKeys,
-        inputs,
-        keydown: (...keys) => { keys.forEach(key => { pressedKeys.add(key); }); },
-        keyup: (...keys) => { keys.forEach(key => { pressedKeys.delete(key); }); }
+        //keydown: (...keys: key[]): void => { keys.forEach(key => { pressedKeys.add(key); }); }, 
+        //keyup : (...keys: key[]): void => { keys.forEach(key => { pressedKeys.delete(key); })}
     };
 }
 export function createDeepCopyFromTetromino(tetromino) {
@@ -115,7 +115,10 @@ export function createDeepCopyFromTetromino(tetromino) {
     };
 }
 export function createDeepCopyFromBoard(board) {
-    return { indices: Array.from(board.indices) };
+    return {
+        indices: Array.from(board.indices),
+        filledRows: Array.from(board.filledRows)
+    };
 }
 export function clearTetrominoFromBoard(board) {
     const newBoard = createDeepCopyFromBoard(board);
@@ -157,16 +160,37 @@ export function buildBoardArray() {
             indices.push(status);
         }
     }
-    return { indices: indices };
+    return { indices: indices, filledRows: [] };
+}
+export function destroyFilledRow(board) {
+    const newBoard = createDeepCopyFromBoard(board);
+    const destroyedRows = [];
+    for (let y = BOARD_INNER_HEIGHT; y >= 0; --y) {
+        let rowIsBusy = true;
+        for (let x = 1; x <= BOARD_INNER_WIDTH; ++x) {
+            if (newBoard.indices[xyToIndex({ x, y }, BOARD_WIDTH)] == CELL_EMPTY) {
+                rowIsBusy = false;
+                break;
+            }
+        }
+        if (rowIsBusy) {
+            for (let x = 1; x < BOARD_INNER_WIDTH; ++x)
+                newBoard.indices[xyToIndex({ x, y }, BOARD_WIDTH)] = CELL_EMPTY;
+            newBoard.filledRows.push(y);
+        }
+    }
+    return newBoard;
 }
 export function gravity(board) {
     const newBoard = createDeepCopyFromBoard(board);
-    for (let y = BOARD_HEIGHT - 1; y >= 0; --y) {
-        for (let x = 0; x < BOARD_WIDTH; ++x) {
+    for (let y = BOARD_INNER_HEIGHT; y >= 0; --y) {
+        for (let x = 1; x < BOARD_INNER_WIDTH; ++x) {
             const bottomRow = addVec2({ x, y }, { x: 0, y: 1 });
-            //console.log(BOARD_HEIGHT -1)
-            if (board[xyToIndex(bottomRow, BOARD_WIDTH)] == CELL_EMPTY)
-                newBoard[xyToIndex({ x, y }, BOARD_WIDTH)] = board[xyToIndex(bottomRow, BOARD_WIDTH)];
+            let cellValue = board.indices[xyToIndex({ x, y }, BOARD_WIDTH)];
+            const cellBottomRowValue = board.indices[xyToIndex(bottomRow, BOARD_WIDTH)];
+            if (cellBottomRowValue == CELL_EMPTY) {
+                newBoard.indices[xyToIndex(bottomRow, BOARD_WIDTH)] = cellValue;
+            }
         }
     }
     return newBoard;
@@ -178,7 +202,7 @@ export function render(board, tetromino, pressedKeys) {
     });
     document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
     document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
-    document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys).reduce((a, b) => a + " " + b, "")}`;
+    document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys.keys()).reduce((a, b) => a + " " + b, "")}`;
 }
 export function buildDivBoard(board, containerId) {
     const container = document.getElementById(containerId);

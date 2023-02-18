@@ -3,7 +3,7 @@ import {
   action,
   IBoard,
   ITetromino,
-  key,
+ // key,
   ITickManager, 
 } from "./const.js";
 
@@ -14,17 +14,19 @@ import {
   setInput,
   setAction,
   putTetrominoInsideBoard,
-  createDeepCopyFromTetromino,
+  //createDeepCopyFromTetromino,
   willCollide,
   buildDivBoard,
   render,
   tryKick, 
   isTickFall,
   freezeTetromino,
-  gravity
+  gravity,
+  destroyFilledRow
 } from "./util.js";
 
-const {pressedKeys, inputs, keydown, keyup} = setInput();
+//const {pressedKeys, inputs, keydown, keyup} = setInput();
+const {pressedKeys} = setInput();
 const tick: ITickManager = {count:0, rate:10};  
 let board: IBoard = buildBoardArray();
 
@@ -37,45 +39,37 @@ function update() {
 
     const tickFall = isTickFall(tick);
 
-    if(tickFall)
-      board = gravity(board);
+    //if(tickFall)
+   //   board = gravity(board);
 
-    inputs.forEach((action: action, key: key) => {        
-
-      if (pressedKeys.has(key)) {        
-
-        if(willCollide(board, tetromino, action)){                        
-
-          switch(action){
-
-            case "clockwise": 
-            case "counterClockwise": {
-              
-              tetromino = tryKick(board, tetromino, action);
-              break;
-            }            
-            case "down": {
-
-              if(tickFall) {
-
-                tetromino = freezeTetromino(tetromino);             
-                board = putTetrominoInsideBoard(board, tetromino);                
-                tetromino = getRandomTetromino();
-              }
-            }
-          }          
-
-        } else {
+    pressedKeys.forEach((action: action, _) => { 
+        
+        if(willCollide(board, tetromino, action)){
+        
+          if(action == "clockwise" || action === "counterClockwise")
+            tetromino = tryKick(board, tetromino, action);          
+        }
+        else {
 
           tetromino = setAction(tetromino, action);
         }
-      }            
-    }); 
+    });
+    
+    if(tickFall){
 
- //   keyup("a", "s"); 
+      if(willCollide(board, tetromino, "down")){
 
-   // if(tickFall) 
-   //   keyup("ArrowDown");
+        tetromino = freezeTetromino(tetromino);             
+        board = putTetrominoInsideBoard(board, tetromino);                
+        tetromino = getRandomTetromino();        
+      }
+      else{
+
+        tetromino = setAction(tetromino, "down");
+      }
+
+      board = destroyFilledRow(board);
+    }
 
     board = clearTetrominoFromBoard(board); 
     board = putTetrominoInsideBoard(board, tetromino);
