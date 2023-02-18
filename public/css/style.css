@@ -1,0 +1,71 @@
+*{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+html{
+    height: 100%;
+}
+body{
+    font-family: spaceMission;
+    background-color: cornflowerblue;
+    color:white;
+}
+
+@font-face {
+    font-family: spaceMission;
+    src: url(../fonts/SpaceMission-rgyw9.otf);   
+}
+
+#start-scene,
+#play-scene{
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    letter-spacing: .5rem;;
+}
+
+#start-scene > h2 {
+    animation: blinker 1s linear infinite;
+  }
+  
+  @keyframes blinker {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  #board {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    background-color: darkslategray;
+    border: none;
+  }
+
+  #board > div {
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: row;
+  }
+
+[data-cell-type]{
+    height: 1.5rem;
+    width: 1.5rem; 
+    border-radius: .2rem; 
+}
+
+[data-cell-type="1"]{
+    border: outset .2rem slategray;
+    background-color: slategray;
+}
+[data-cell-type="2"],
+[data-cell-type="3"]{
+    border: outset .2rem rgb(255, 243, 74);
+    background-color: rgb(255, 243, 74);
+}

@@ -1,6 +1,6 @@
 export type action = "left" | "right" | "down" | "up" | "clockwise" | "counterClockwise";
 //export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
-export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"; 
+export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"| "J"; 
 export type rotationState = "spawn" | "right" | "left" | "twoRotation";
 export enum rotateTo { left = -1, right = 1};
 
@@ -78,15 +78,98 @@ export const I_TETROMINO_WALL_KICK_DATA: IRotationState[] = [
     {from: "spawn", to: "left",tests: [{x:-1, y:0}, {x:2, y:0}, {x:-1, y:2}, {x:2, y:-1}]},
 ];
 
+export const J_TETROMINO: ITetromino = {
+
+    name: "J",  
+    coord: {x:5 , y:0},
+    rotationState: "spawn",  
+    indices: [
+
+        0, CELL_TETROMINO, 0,  
+        0, CELL_TETROMINO, 0,  
+        CELL_TETROMINO, CELL_TETROMINO, 0,  
+        
+    ]
+}
+
 export const L_TETROMINO: ITetromino = {
 
     name: "L",  
-    coord: {x:0 , y:0},
+    coord: {x:5 , y:0},
     rotationState: "spawn",  
     indices: [
+
         0, CELL_TETROMINO, 0,  
         0, CELL_TETROMINO, 0,  
         0, CELL_TETROMINO, CELL_TETROMINO,  
         
+    ]
+}
+
+export const T_TETROMINO: ITetromino = {
+
+    name: "T",  
+    coord: {x:5 , y:0},
+    rotationState: "spawn",  
+    indices: [
+
+        0, 0, 0,  
+        CELL_TETROMINO, CELL_TETROMINO, CELL_TETROMINO,  
+        0, CELL_TETROMINO, 0,  
+        
+    ]
+}
+
+export const S_TETROMINO: ITetromino = {
+
+    name: "S",  
+    coord: {x:5 , y:0},
+    rotationState: "spawn",  
+    indices: [
+
+        0, CELL_TETROMINO, CELL_TETROMINO,  
+        CELL_TETROMINO, CELL_TETROMINO, 0,  
+        0, 0, 0,  
+        
+    ]
+}
+
+export const Z_TETROMINO: ITetromino = {
+
+    name: "Z",  
+    coord: {x:5 , y:0},
+    rotationState: "spawn",  
+    indices: [
+
+        CELL_TETROMINO, CELL_TETROMINO, 0,  
+        0, CELL_TETROMINO, CELL_TETROMINO,  
+        0, 0, 0,  
+        
+    ]
+}
+
+export const O_TETROMINO: ITetromino = {
+
+    name: "O",  
+    coord: {x:5 , y:0},
+    rotationState: "spawn",  
+    indices: [
+
+        CELL_TETROMINO, CELL_TETROMINO,  
+        CELL_TETROMINO, CELL_TETROMINO, 
+    ]
+}
+
+export const I_TETROMINO: ITetromino = {
+
+    name: "I",  
+    coord: {x:5 , y:0},
+    rotationState: "spawn",  
+    indices: [
+
+        0, CELL_TETROMINO, 0, 0,  
+        0, CELL_TETROMINO, 0, 0,  
+        0, CELL_TETROMINO, 0, 0,  
+        0, CELL_TETROMINO, 0, 0         
     ]
 }

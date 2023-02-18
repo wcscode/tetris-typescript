@@ -1,4 +1,4 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, BOARD_INNER_HEIGHT, BOARD_INNER_WIDTH, } from "./const.js";
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, BOARD_INNER_HEIGHT, BOARD_INNER_WIDTH, J_TETROMINO, I_TETROMINO, T_TETROMINO, S_TETROMINO, Z_TETROMINO, O_TETROMINO, } from "./const.js";
 export function freezeTetromino(tetromino) {
     const newTetromino = createDeepCopyFromTetromino(tetromino);
     for (let i = 0; i < newTetromino.indices.length; i++) {
@@ -147,7 +147,13 @@ export function putTetrominoInsideBoard(board, tetromino) {
 }
 export function getRandomTetromino() {
     const tetrominos = [];
+    tetrominos.push(J_TETROMINO);
     tetrominos.push(L_TETROMINO);
+    tetrominos.push(T_TETROMINO);
+    tetrominos.push(S_TETROMINO);
+    tetrominos.push(Z_TETROMINO);
+    tetrominos.push(O_TETROMINO);
+    tetrominos.push(I_TETROMINO);
     return createDeepCopyFromTetromino(tetrominos[Math.floor(Math.random() * tetrominos.length)]);
 }
 export function buildBoardArray() {
@@ -197,12 +203,15 @@ export function applyGravity(board) {
 }
 export function render(board, tetromino, pressedKeys) {
     board.indices.forEach((_, index) => {
-        const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
-        cellElement.innerHTML = board.indices[index] == CELL_EMPTY ? "" : board.indices[index].toString();
+        if (board.indices[index] !== CELL_WALL) {
+            const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
+            //cellElement.innerHTML =  board.indices[index] == CELL_EMPTY ? "" : board.indices[index].toString();
+            cellElement.setAttribute("data-cell-type", board.indices[index].toString());
+        }
     });
-    document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
-    document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
-    document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys.keys()).reduce((a, b) => a + " " + b, "")}`;
+    // document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
+    document.getElementById('rotationState').innerHTML = `${tetromino.name}`;
+    // document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys.keys()).reduce((a, b) => a + " " + b, "")}`;
 }
 export function buildDivBoard(board, containerId) {
     const container = document.getElementById(containerId);
@@ -214,9 +223,10 @@ export function buildDivBoard(board, containerId) {
             const cell = document.createElement('span');
             const index = xyToIndex({ x, y }, BOARD_WIDTH).toString();
             cell.setAttribute("data-cell-id", index);
-            cell.style.display = "inline-block";
-            cell.style.width = cell.style.height = "1.2rem";
-            cell.innerHTML = board.indices[index] == 0 ? "" : board.indices[index];
+            //cell.style.display = "inline-block";
+            //cell.style.width = cell.style.height = "1.2rem";
+            // cell.innerHTML = board.indices[index] == 0 ? "" : board.indices[index];
+            cell.setAttribute("data-cell-type", board.indices[index]);
             row.append(cell);
         }
         container.appendChild(row);
