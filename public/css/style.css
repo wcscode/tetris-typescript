@@ -8,14 +8,14 @@ html{
     height: 100%;
 }
 body{
-    font-family: spaceMission;
+    font-family: ArcadeClassic;
     background-color: cornflowerblue;
     color:white;
 }
 
 @font-face {
-    font-family: spaceMission;
-    src: url(../fonts/SpaceMission-rgyw9.otf);   
+    font-family: ArcadeClassic;
+    src: url(../fonts/ARCADECLASSIC.TTF);   
 }
 
 #start-scene,
@@ -26,6 +26,19 @@ body{
     justify-content: center;
     flex-direction: column;
     letter-spacing: .5rem;;
+}
+
+#play-scene {
+    flex-direction: row;  
+    gap: 20px; 
+}
+#score {
+    background-color: darkslategray;   
+   
+    padding: 1rem;
+    border: outset .2rem slategray;   
+    text-align: center;
+    font-size: 2rem;
 }
 
 #start-scene > h2 {

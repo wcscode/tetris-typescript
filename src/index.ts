@@ -14,21 +14,21 @@ import {
   setInput,
   setAction,
   putTetrominoInsideBoard,
-  //createDeepCopyFromTetromino,
   willCollide,
   buildDivBoard,
   render,
-  tryKick, 
   isTickFall,
   freezeTetromino,
   destroyFilledRow,
-  applyGravity
+  applyGravity,
+  tryKickRotation
 } from "./util.js";
 
 //const {pressedKeys, inputs, keydown, keyup} = setInput();
-const {pressedKeys} = setInput();
+const {pressedKeys, cancelAction} = setInput();
 const tick: ITickManager = {count:0, rate:10};  
 let board: IBoard = buildBoardArray();
+let score = 0;
 
 buildDivBoard(board, "board");
 
@@ -37,17 +37,22 @@ board = putTetrominoInsideBoard(board, tetromino);
 
 function update() {
 
-    pressedKeys.forEach((action: action, _) => { 
+    pressedKeys.forEach((action: action, key: string) => { 
         
+      const isRotation = action == "clockwise" || action === "counterClockwise";
+
         if(willCollide(board, tetromino, action)){
         
-          if(action == "clockwise" || action === "counterClockwise")
-            tetromino = tryKick(board, tetromino, action);          
+          if(isRotation)           
+            tetromino = tryKickRotation(board, tetromino, action); 
         }
         else {
 
           tetromino = setAction(tetromino, action);
         }
+
+        if(isRotation)
+          cancelAction(key);
     });
     
     if(isTickFall(tick)){
@@ -64,13 +69,14 @@ function update() {
       }
 
       board = destroyFilledRow(board);
-      board = applyGravity(board);
+      score += board.destroyedRows.length;
+      board = applyGravity(board);      
     }
 
     board = clearTetrominoFromBoard(board); 
     board = putTetrominoInsideBoard(board, tetromino);
 
-    render(board, tetromino, pressedKeys);
+    render(board, score, /* tetromino, pressedKeys*/);
   }
 
 setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);

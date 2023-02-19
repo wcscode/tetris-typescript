@@ -26,9 +26,9 @@ import {
     T_TETROMINO,
     S_TETROMINO,
     Z_TETROMINO,
-    O_TETROMINO,
-   
-} from "./const.js";
+    O_TETROMINO
+}      
+from "./const.js";
 
 export function freezeTetromino(tetromino: ITetromino): ITetromino {
 
@@ -50,9 +50,9 @@ export function isTickFall(tick :ITickManager): boolean {
     return tick.count % tick.rate === 0;
 }
 
-export function tryKick(board: IBoard, tetromino: ITetromino, action: action): ITetromino {    
+export function tryKickRotation(board: IBoard, tetromino: ITetromino, action: action): ITetromino {    
 
-    const newTetromino = createDeepCopyFromTetromino(tetromino);
+    let newTetromino = createDeepCopyFromTetromino(tetromino);
     const wallsKicksDatas = newTetromino.name == "I" ? 
         I_TETROMINO_WALL_KICK_DATA : 
         JLTSZ_TETROMINO_WALL_KICK_DATA;        
@@ -66,12 +66,12 @@ export function tryKick(board: IBoard, tetromino: ITetromino, action: action): I
 
     for(let i = 0; i < wallKickData.tests.length; ++i) { 
 
-        newTetromino.coord = addVec2(newTetromino.coord, wallKickData.tests[i]);            
+        newTetromino.coord = addVec2(tetromino.coord, wallKickData.tests[i]);            
 
         if(!willCollide(board, newTetromino, action)){
 
-            tetromino = newTetromino;               
-            break;               
+            newTetromino = setAction(newTetromino, action)
+            return newTetromino;        
         }
     };  
 
@@ -174,15 +174,37 @@ export function setInput(): IInputManager {
     allowedInputs.set("s", "clockwise");
 
     const pressedKeys = new Map<string, action>();    
+    const canceledKeys = new Set<string>();
 
-    window.addEventListener("keydown", (event) => {  if(allowedInputs.has(event.key)) pressedKeys.set(event.key, allowedInputs.get(event.key)); }); 
-    window.addEventListener("keyup", (event) => {  pressedKeys.delete(event.key); });   
+    window.addEventListener("keydown", (event) => { 
+        
+        if(allowedInputs.has(event.key)){
+
+            if(!canceledKeys.has(event.key))
+                pressedKeys.set(event.key, allowedInputs.get(event.key)); 
+        }
+    }); 
+
+    window.addEventListener("keyup", (event) => { 
+
+        pressedKeys.delete(event.key); 
+        
+        if(canceledKeys.has(event.key))
+            canceledKeys.delete(event.key);
+    });   
 
     return {
 
         pressedKeys,
         //keydown: (...keys: key[]): void => { keys.forEach(key => { pressedKeys.add(key); }); }, 
-        //keyup : (...keys: key[]): void => { keys.forEach(key => { pressedKeys.delete(key); })}
+        cancelAction : (...keys: string[]): void => { 
+
+            keys.forEach(key => { 
+
+                pressedKeys.delete(key); 
+                canceledKeys.add(key);
+            });
+        }
     };
 }
 
@@ -332,7 +354,7 @@ export function applyGravity(board: IBoard): IBoard {
     return newBoard;
 }
 
-export function render(board: IBoard, tetromino:ITetromino, pressedKeys: Map<string, action>): void {
+export function render(board: IBoard, score:number/* tetromino:ITetromino, pressedKeys: Map<string, action>*/): void {
   
     board.indices.forEach((_, index) => {
 
@@ -344,8 +366,9 @@ export function render(board: IBoard, tetromino:ITetromino, pressedKeys: Map<str
         }       
     });
    
+    document.getElementById('score').innerHTML = score.toString();
    // document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
-   document.getElementById('rotationState').innerHTML = `${tetromino.name}`;
+   // document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
    // document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys.keys()).reduce((a, b) => a + " " + b, "")}`;
 }
 

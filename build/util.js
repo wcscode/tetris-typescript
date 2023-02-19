@@ -1,4 +1,4 @@
-import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, BOARD_INNER_HEIGHT, BOARD_INNER_WIDTH, J_TETROMINO, I_TETROMINO, T_TETROMINO, S_TETROMINO, Z_TETROMINO, O_TETROMINO, } from "./const.js";
+import { BOARD_WIDTH, BOARD_HEIGHT, CELL_TETROMINO, CELL_EMPTY, CELL_WALL, CELL_FROZEN, L_TETROMINO, rotateTo, ROTATIONS_STATES_LENGTH, ROTATIONS_STATES, I_TETROMINO_WALL_KICK_DATA, JLTSZ_TETROMINO_WALL_KICK_DATA, BOARD_INNER_HEIGHT, BOARD_INNER_WIDTH, J_TETROMINO, I_TETROMINO, T_TETROMINO, S_TETROMINO, Z_TETROMINO, O_TETROMINO } from "./const.js";
 export function freezeTetromino(tetromino) {
     const newTetromino = createDeepCopyFromTetromino(tetromino);
     for (let i = 0; i < newTetromino.indices.length; i++) {
@@ -11,8 +11,8 @@ export function isTickFall(tick) {
     tick.count++;
     return tick.count % tick.rate === 0;
 }
-export function tryKick(board, tetromino, action) {
-    const newTetromino = createDeepCopyFromTetromino(tetromino);
+export function tryKickRotation(board, tetromino, action) {
+    let newTetromino = createDeepCopyFromTetromino(tetromino);
     const wallsKicksDatas = newTetromino.name == "I" ?
         I_TETROMINO_WALL_KICK_DATA :
         JLTSZ_TETROMINO_WALL_KICK_DATA;
@@ -20,10 +20,10 @@ export function tryKick(board, tetromino, action) {
         f.to == newRotationState(newTetromino.rotationState, action == "clockwise" ?
             rotateTo.right : rotateTo.left));
     for (let i = 0; i < wallKickData.tests.length; ++i) {
-        newTetromino.coord = addVec2(newTetromino.coord, wallKickData.tests[i]);
+        newTetromino.coord = addVec2(tetromino.coord, wallKickData.tests[i]);
         if (!willCollide(board, newTetromino, action)) {
-            tetromino = newTetromino;
-            break;
+            newTetromino = setAction(newTetromino, action);
+            return newTetromino;
         }
     }
     ;
@@ -97,13 +97,27 @@ export function setInput() {
     allowedInputs.set("a", "counterClockwise");
     allowedInputs.set("s", "clockwise");
     const pressedKeys = new Map();
-    window.addEventListener("keydown", (event) => { if (allowedInputs.has(event.key))
-        pressedKeys.set(event.key, allowedInputs.get(event.key)); });
-    window.addEventListener("keyup", (event) => { pressedKeys.delete(event.key); });
+    const canceledKeys = new Set();
+    window.addEventListener("keydown", (event) => {
+        if (allowedInputs.has(event.key)) {
+            if (!canceledKeys.has(event.key))
+                pressedKeys.set(event.key, allowedInputs.get(event.key));
+        }
+    });
+    window.addEventListener("keyup", (event) => {
+        pressedKeys.delete(event.key);
+        if (canceledKeys.has(event.key))
+            canceledKeys.delete(event.key);
+    });
     return {
         pressedKeys,
         //keydown: (...keys: key[]): void => { keys.forEach(key => { pressedKeys.add(key); }); }, 
-        //keyup : (...keys: key[]): void => { keys.forEach(key => { pressedKeys.delete(key); })}
+        cancelAction: (...keys) => {
+            keys.forEach(key => {
+                pressedKeys.delete(key);
+                canceledKeys.add(key);
+            });
+        }
     };
 }
 export function createDeepCopyFromTetromino(tetromino) {
@@ -201,7 +215,7 @@ export function applyGravity(board) {
     newBoard.destroyedRows = [];
     return newBoard;
 }
-export function render(board, tetromino, pressedKeys) {
+export function render(board, score /* tetromino:ITetromino, pressedKeys: Map<string, action>*/) {
     board.indices.forEach((_, index) => {
         if (board.indices[index] !== CELL_WALL) {
             const cellElement = document.querySelector(`[data-cell-id="${index}"]`);
@@ -209,8 +223,9 @@ export function render(board, tetromino, pressedKeys) {
             cellElement.setAttribute("data-cell-type", board.indices[index].toString());
         }
     });
+    document.getElementById('score').innerHTML = score.toString();
     // document.getElementById('coord').innerHTML = `x:${tetromino.coord.x} y:${tetromino.coord.y}`;
-    document.getElementById('rotationState').innerHTML = `${tetromino.name}`;
+    // document.getElementById('rotationState').innerHTML = `${tetromino.rotationState}`;
     // document.getElementById('pressedKeys').innerHTML = `${Array.from(pressedKeys.keys()).reduce((a, b) => a + " " + b, "")}`;
 }
 export function buildDivBoard(board, containerId) {
