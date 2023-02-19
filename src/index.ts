@@ -21,11 +21,14 @@ import {
   freezeTetromino,
   destroyFilledRow,
   applyGravity,
-  tryKickRotation
+  tryKickRotation,
+  stateScene,
+  isGameOver
 } from "./util.js";
 
-//const {pressedKeys, inputs, keydown, keyup} = setInput();
+const {setScene, getScene} = stateScene();
 const {pressedKeys, cancelAction} = setInput();
+
 const tick: ITickManager = {count:0, rate:10};  
 let board: IBoard = buildBoardArray();
 let score = 0;
@@ -35,48 +38,99 @@ buildDivBoard(board, "board");
 let tetromino: ITetromino = getRandomTetromino();
 board = putTetrominoInsideBoard(board, tetromino);
 
-function update() {
+let interval = 0;
 
-    pressedKeys.forEach((action: action, key: string) => { 
-        
-      const isRotation = action == "clockwise" || action === "counterClockwise";
+window.addEventListener("keydown", function(event) { 
 
-        if(willCollide(board, tetromino, action)){
-        
-          if(isRotation)           
-            tetromino = tryKickRotation(board, tetromino, action); 
-        }
-        else {
+  if(event.key == "Enter"){
 
-          tetromino = setAction(tetromino, action);
-        }
+    if(getScene() == "start") {
 
-        if(isRotation)
-          cancelAction(key);
-    });
-    
-    if(isTickFall(tick)){
+      document.getElementById("start-scene").style.display = "none";
+      document.getElementById("play-scene").style.display = "flex";
+      document.getElementById('game-over').style.display = "none";
 
-      if(willCollide(board, tetromino, "down")){
-
-        tetromino = freezeTetromino(tetromino);             
-        board = putTetrominoInsideBoard(board, tetromino);                
-        tetromino = getRandomTetromino();        
-      }
-      else{
-
-        tetromino = setAction(tetromino, "down");
-      }
-
-      board = destroyFilledRow(board);
-      score += board.destroyedRows.length;
-      board = applyGravity(board);      
+      setScene("play");
+      
+      tick.count = 0;
+      tick.rate = 10;  
+      board = buildBoardArray();
+      score = 0;
+    //  buildDivBoard(board, "board");
+      tetromino = getRandomTetromino();
+      board = putTetrominoInsideBoard(board, tetromino);
+      interval = setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);
     }
 
-    board = clearTetrominoFromBoard(board); 
-    board = putTetrominoInsideBoard(board, tetromino);
-
-    render(board, score, /* tetromino, pressedKeys*/);
+    return;     
   }
 
-setInterval(update, UPDATE_FRAME_IN_MILLISECONDS);
+  if(event.key == "Escape"){
+
+    if(getScene() == "play") {
+
+      document.getElementById("start-scene").style.display = "flex";
+      document.getElementById("play-scene").style.display = "none";
+      setScene("start");  
+      clearInterval(interval);
+    }
+
+    return;     
+  }
+});
+
+function update() {
+
+  if(isGameOver(board)) {
+
+    document.getElementById('game-over').style.display = "block";
+    clearInterval(interval);
+    return;  
+  }
+
+  pressedKeys.forEach((action: action, key: string) => { 
+      
+    const isRotation = action == "clockwise" || action === "counterClockwise";
+
+      if(willCollide(board, tetromino, action)){
+      
+        if(isRotation)           
+          tetromino = tryKickRotation(board, tetromino, action); 
+      }
+      else {
+
+        tetromino = setAction(tetromino, action);
+      }
+
+      if(isRotation)
+        cancelAction(key);
+  });
+  
+  if(isTickFall(tick)){
+
+    if(willCollide(board, tetromino, "down")){
+
+      tetromino = freezeTetromino(tetromino);             
+      board = putTetrominoInsideBoard(board, tetromino);                
+      tetromino = getRandomTetromino();           
+    }
+    else{
+
+      tetromino = setAction(tetromino, "down");
+    }
+
+    board = destroyFilledRow(board);
+    score += board.destroyedRows.length;
+    board = applyGravity(board);  
+    //tick.rate -= board.destroyedRows.length;   
+  }
+
+  board = clearTetrominoFromBoard(board); 
+  board = putTetrominoInsideBoard(board, tetromino);
+
+  render(board, score, /* tetromino, pressedKeys*/);
+
+   
+}
+
+

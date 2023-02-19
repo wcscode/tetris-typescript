@@ -1,9 +1,14 @@
 export type action = "left" | "right" | "down" | "up" | "clockwise" | "counterClockwise";
 //export type key = "ArrowLeft" | "ArrowRight" | "ArrowDown" | "a" | "s";
+export type sceneName = "start" | "play";
 export type tetrominoName = "I" | "L" | "T" | "O" | "S" | "Z"| "J"; 
 export type rotationState = "spawn" | "right" | "left" | "twoRotation";
 export enum rotateTo { left = -1, right = 1};
 
+export interface SceneManager {
+    setScene(name: sceneName): void;
+    getScene(): sceneName;
+}
 export interface vec2 {
 
     x: number, 

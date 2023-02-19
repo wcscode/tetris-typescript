@@ -6,16 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="public/css/style.css" />
     <script type="module" src="build/index.js" defer></script>    
-    <title>T Typescript</title> 
+    <title>Tetris Typescript</title> 
 </head>
 <body>
-<div id="start-scene" style="display:none">
+<div id="start-scene">
     <h1>TETRIS</h1>
     <h2>Press Enter</h2>
 </div>  
-<div id="play-scene">  
-    <div id="board"></div>
+<div id="play-scene" style="display:none;">    
+    <div id="board">
+        <div id="game-over" style="display:none;">Game Over!<br />Press Esc</div>
+    </div>
     <div id="score">0</div>
+    
     <!--<span id="pressedKeys" style="display: block;"></span> 
     <span id="coord"></span>
     <span id="rotationState" ></span> -->

@@ -32,6 +32,7 @@ body{
     flex-direction: row;  
     gap: 20px; 
 }
+
 #score {
     background-color: darkslategray;   
    
@@ -39,6 +40,12 @@ body{
     border: outset .2rem slategray;   
     text-align: center;
     font-size: 2rem;
+}
+
+#game-over {
+    position: absolute;
+    padding: 1rem;
+    background-color: black;
 }
 
 #start-scene > h2 {

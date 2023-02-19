@@ -26,7 +26,9 @@ import {
     T_TETROMINO,
     S_TETROMINO,
     Z_TETROMINO,
-    O_TETROMINO
+    O_TETROMINO,
+    sceneName,
+    SceneManager
 }      
 from "./const.js";
 
@@ -300,6 +302,27 @@ export function buildBoardArray(): IBoard {
     }
 
     return {indices: indices, destroyedRows:[]};    
+}
+
+export function stateScene(): SceneManager {
+
+    //const scenes: sceneName[] =["gameOver", "play", "restart", "start", "startPlay"];
+    let currentScene: sceneName = "start";
+
+    return {
+        
+        setScene: function(name:sceneName): void {  currentScene = name; }, 
+        getScene: function(): sceneName { return currentScene; }
+    };
+}
+
+export function isGameOver(board): boolean {
+
+    for(let x: number = 1; x <= BOARD_INNER_WIDTH; ++x)           
+        if(board.indices[xyToIndex({x, y:1}, BOARD_WIDTH)] == CELL_FROZEN) 
+            return true;          
+         
+    return false;
 }
 
 export function destroyFilledRow(board: IBoard): IBoard{

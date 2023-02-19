@@ -182,6 +182,20 @@ export function buildBoardArray() {
     }
     return { indices: indices, destroyedRows: [] };
 }
+export function stateScene() {
+    //const scenes: sceneName[] =["gameOver", "play", "restart", "start", "startPlay"];
+    let currentScene = "start";
+    return {
+        setScene: function (name) { currentScene = name; },
+        getScene: function () { return currentScene; }
+    };
+}
+export function isGameOver(board) {
+    for (let x = 1; x <= BOARD_INNER_WIDTH; ++x)
+        if (board.indices[xyToIndex({ x, y: 1 }, BOARD_WIDTH)] == CELL_FROZEN)
+            return true;
+    return false;
+}
 export function destroyFilledRow(board) {
     const newBoard = createDeepCopyFromBoard(board);
     for (let y = BOARD_INNER_HEIGHT; y >= 0; --y) {
