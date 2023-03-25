@@ -174,6 +174,8 @@ export function setInput(): IInputManager {
     allowedInputs.set("ArrowDown", "down");
     allowedInputs.set("a", "counterClockwise");    
     allowedInputs.set("s", "clockwise");
+    allowedInputs.set("A", "counterClockwise");    
+    allowedInputs.set("S", "clockwise");
 
     const pressedKeys = new Map<string, action>();    
     const canceledKeys = new Set<string>();

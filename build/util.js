@@ -96,6 +96,8 @@ export function setInput() {
     allowedInputs.set("ArrowDown", "down");
     allowedInputs.set("a", "counterClockwise");
     allowedInputs.set("s", "clockwise");
+    allowedInputs.set("A", "counterClockwise");
+    allowedInputs.set("S", "clockwise");
     const pressedKeys = new Map();
     const canceledKeys = new Set();
     window.addEventListener("keydown", (event) => {
